@@ -464,8 +464,8 @@ type NewOrderV3Accounts struct {
 type InstructionNewOrderV3 struct {
 	Side                             Side
 	LimitPrice                       uint64
-	MaxCoinQuantity                  uint64
-	MaxNativePCQuantityIncludingFees uint64
+	MaxCoinQuantity                  uint64 // In SerumTS they call it MaxBaseQuantity
+	MaxNativePCQuantityIncludingFees uint64 // In SerumTS they call it MaxNativeQuoteQuantity
 	SelfTradeBehavior                SelfTradeBehavior
 	OrderType                        OrderType
 	ClientOrderID                    uint64
