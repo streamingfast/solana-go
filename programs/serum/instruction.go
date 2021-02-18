@@ -242,7 +242,7 @@ type CancelOrderAccounts struct {
 // InstructionCancelOrder seems to be unused after DEX v3 (unconfirmed claim)
 type InstructionCancelOrder struct {
 	Side          Side
-	OrderID       bin.Uint128
+	OrderID       OrderID
 	OpenOrders    solana.PublicKey
 	OpenOrderSlot uint8
 
@@ -509,7 +509,7 @@ type CancelOrderV2Accounts struct {
 
 type InstructionCancelOrderV2 struct {
 	Side    Side
-	OrderID bin.Uint128
+	OrderID OrderID
 
 	Accounts *CancelOrderV2Accounts `bin:"-"`
 }
