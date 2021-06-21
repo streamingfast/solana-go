@@ -135,6 +135,13 @@ func (c *Client) GetConfirmedSignaturesForAddress2(ctx context.Context, address 
 	return
 }
 
+func (c *Client) GetSignaturesForAddress(ctx context.Context, address solana.PublicKey, opts *GetSignaturesForAddressOpts) (out GetSignaturesForAddressResult, err error) {
+	params := []interface{}{address.String(), opts}
+
+	err := c.rpcClient.CallFor(&out, "getSignaturesForAddress", params...)
+	return
+}
+
 func (c *Client) GetProgramAccounts(ctx context.Context, publicKey solana.PublicKey, opts *GetProgramAccountsOpts) (out GetProgramAccountsResult, err error) {
 	obj := map[string]interface{}{
 		"encoding": "base64",

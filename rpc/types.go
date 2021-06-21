@@ -121,6 +121,14 @@ type GetConfirmedSignaturesForAddress2Opts struct {
 
 type GetConfirmedSignaturesForAddress2Result []*TransactionSignature
 
+type GetSignaturesForAddressOpts struct {
+	Limit  uint64 `json:"limit,omitempty"`
+	Before string `json:"before,omitempty"`
+	Until  string `json:"until,omitempty"`
+}
+
+type GetSignaturesForAddressResult []*TransactionSignature
+
 type RPCFilter struct {
 	Memcmp   *RPCFilterMemcmp `json:"memcmp,omitempty"`
 	DataSize bin.Uint64       `json:"dataSize,omitempty"`
