@@ -138,7 +138,7 @@ func (c *Client) GetConfirmedSignaturesForAddress2(ctx context.Context, address 
 func (c *Client) GetSignaturesForAddress(ctx context.Context, address solana.PublicKey, opts *GetSignaturesForAddressOpts) (out GetSignaturesForAddressResult, err error) {
 	params := []interface{}{address.String(), opts}
 
-	err := c.rpcClient.CallFor(&out, "getSignaturesForAddress", params...)
+	err = c.rpcClient.CallFor(&out, "getSignaturesForAddress", params...)
 	return
 }
 
