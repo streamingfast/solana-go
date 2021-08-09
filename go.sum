@@ -66,13 +66,11 @@ github.com/daaku/go.zipexe v1.0.0/go.mod h1:z8IiR6TsVLEYKwXAoE/I+8ys/sDkgTzSL0CL
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/dfuse-io/binary v0.0.0-20201123150056-096380ef3e5d h1:GcxIdxuJIC7dhfU8Dh5VuJte9QC+JaWV8/v9D6kshzg=
-github.com/dfuse-io/binary v0.0.0-20201123150056-096380ef3e5d/go.mod h1:GDFX6qH3BQZPWTeYaA4ZW98T94zs2skRoG3oMz/0jw0=
 github.com/dfuse-io/logging v0.0.0-20201110202154-26697de88c79/go.mod h1:V+ED4kT/t/lKtH99JQmKIb0v9WL3VaYkJ36CfHlVECI=
 github.com/dfuse-io/logging v0.0.0-20210109005628-b97a57253f70 h1:CuJS05R9jmNlUK8GOxrEELPbfXm0EuGh/30LjkjN5vo=
 github.com/dfuse-io/logging v0.0.0-20210109005628-b97a57253f70/go.mod h1:EoK/8RFbMEteaCaz89uessDTnCWjbbcr+DXcBh4el5o=
-github.com/dfuse-io/solana-go v0.2.0 h1:i7HzMR2b3nexyT0i+G7YeBDZFzzMbD+tEgHKsfmc7oo=
-github.com/dfuse-io/solana-go v0.2.0/go.mod h1:JmxX8KYNWRCwg1RyADE2kersXSNqE1KLt+w5nEq353g=
+github.com/streamingfast/solana-go v0.2.0 h1:i7HzMR2b3nexyT0i+G7YeBDZFzzMbD+tEgHKsfmc7oo=
+github.com/streamingfast/solana-go v0.2.0/go.mod h1:JmxX8KYNWRCwg1RyADE2kersXSNqE1KLt+w5nEq353g=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/dgryski/go-sip13 v0.0.0-20181026042036-e10d5fee7954/go.mod h1:vAd38F8PWV+bWy6jNmig1y/TA+kYO4g3RSRF0IAv0no=
 github.com/envoyproxy/go-control-plane v0.9.0/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
