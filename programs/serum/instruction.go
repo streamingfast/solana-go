@@ -4,9 +4,9 @@ import (
 	"encoding/binary"
 	"fmt"
 
-	bin "github.com/dfuse-io/binary"
-	"github.com/dfuse-io/solana-go"
-	"github.com/dfuse-io/solana-go/text"
+	bin "github.com/streamingfast/binary"
+	"github.com/streamingfast/solana-go"
+	"github.com/streamingfast/solana-go/text"
 )
 
 func init() {
@@ -242,7 +242,7 @@ type CancelOrderAccounts struct {
 // InstructionCancelOrder seems to be unused after DEX v3 (unconfirmed claim)
 type InstructionCancelOrder struct {
 	Side          Side
-	OrderID       bin.Uint128
+	OrderID       OrderID
 	OpenOrders    solana.PublicKey
 	OpenOrderSlot uint8
 
@@ -464,8 +464,8 @@ type NewOrderV3Accounts struct {
 type InstructionNewOrderV3 struct {
 	Side                             Side
 	LimitPrice                       uint64
-	MaxCoinQuantity                  uint64
-	MaxNativePCQuantityIncludingFees uint64
+	MaxCoinQuantity                  uint64 // In SerumTS they call it MaxBaseQuantity
+	MaxNativePCQuantityIncludingFees uint64 // In SerumTS they call it MaxNativeQuoteQuantity
 	SelfTradeBehavior                SelfTradeBehavior
 	OrderType                        OrderType
 	ClientOrderID                    uint64
@@ -509,7 +509,7 @@ type CancelOrderV2Accounts struct {
 
 type InstructionCancelOrderV2 struct {
 	Side    Side
-	OrderID bin.Uint128
+	OrderID OrderID
 
 	Accounts *CancelOrderV2Accounts `bin:"-"`
 }

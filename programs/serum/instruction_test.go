@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"testing"
 
-	bin "github.com/dfuse-io/binary"
+	bin "github.com/streamingfast/binary"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

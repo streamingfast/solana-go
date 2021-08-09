@@ -17,7 +17,7 @@ package solana
 import (
 	"fmt"
 
-	bin "github.com/dfuse-io/binary"
+	bin "github.com/streamingfast/binary"
 )
 
 type Transaction struct {

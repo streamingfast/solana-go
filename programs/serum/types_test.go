@@ -9,10 +9,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dfuse-io/solana-go/diff"
+	"github.com/streamingfast/solana-go/diff"
 
-	bin "github.com/dfuse-io/binary"
-	"github.com/dfuse-io/solana-go"
+	bin "github.com/streamingfast/binary"
+	"github.com/streamingfast/solana-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -247,7 +247,7 @@ func TestOrderID(t *testing.T) {
 
 }
 
-func Test_OpenOrderDiff(t *testing.T) {
+func Test_OpenOrderDiff_AddingAnOrder(t *testing.T) {
 	oldDataFile := "testdata/serum-open-orders-old.hex"
 	newDataFile := "testdata/serum-open-orders-new.hex"
 	// is_free_slot diff => 0000f0d0ffffffffffffffffffffffff -> 0000e0d0ffffffffffffffffffffffff
@@ -288,6 +288,60 @@ func Test_OpenOrderDiff(t *testing.T) {
 	assert.Equal(t, hasNewOrder, true)
 	assert.Equal(t, newOrderIndex, uint32(20))
 	newOrder := newOpenOrders.GetOrder(newOrderIndex)
+	assert.Equal(t, &Order{
+		ID: OrderID{
+			Hi: 0x0000000000000840,
+			Lo: 0xffffffffffacdefd,
+		},
+		Side: SideBid,
+	}, newOrder)
+	assert.Equal(t, newOrder.SeqNum(), uint64(5447938))
+	assert.Equal(t, newOrder.Price(), uint64(2112))
+
+}
+
+func Test_OpenOrderDiff_Removing(t *testing.T) {
+	oldDataFile := "testdata/serum-open-orders-new.hex"
+	newDataFile := "testdata/serum-open-orders-old.hex"
+
+	// is_free_slot diff => 0000e0d0ffffffffffffffffffffffff -> 0000f0d0ffffffffffffffffffffffff
+	// IsBidBits diff => d6a5132f000000000000000000000000 -> d7a5032f000000000000000000000000
+	// removed orders[20] => fddeacffffffffff4008000000000000 (price = 2112, seqNum = 5447938) => 00000000000000000000000000000000
+
+	olDataJSONFile := strings.ReplaceAll(oldDataFile, ".hex", ".json")
+	newDataJSONFile := strings.ReplaceAll(newDataFile, ".hex", ".json")
+
+	oldOpenOrders := &OpenOrders{}
+	require.NoError(t, oldOpenOrders.Decode(readHexFile(t, oldDataFile)))
+
+	newOpenOrders := &OpenOrders{}
+	require.NoError(t, newOpenOrders.Decode(readHexFile(t, newDataFile)))
+
+	oldCnt, err := json.MarshalIndent(oldOpenOrders, "", " ")
+	require.NoError(t, err)
+	writeFile(t, olDataJSONFile, oldCnt)
+
+	newCnt, err := json.MarshalIndent(newOpenOrders, "", " ")
+	require.NoError(t, err)
+	writeFile(t, newDataJSONFile, newCnt)
+
+	hasRemovedOrder := false
+	oldOrderIndex := uint32(0)
+	diff.Diff(oldOpenOrders, newOpenOrders, diff.OnEvent(func(event diff.Event) {
+		if match, _ := event.Match("Orders[#]"); match {
+			switch event.Kind {
+			case diff.KindRemoved:
+				if index, found := event.Path.SliceIndex(); found {
+					hasRemovedOrder = true
+					oldOrderIndex = uint32(index)
+				}
+			}
+		}
+	}))
+
+	assert.Equal(t, hasRemovedOrder, true)
+	assert.Equal(t, oldOrderIndex, uint32(20))
+	newOrder := oldOpenOrders.GetOrder(oldOrderIndex)
 	assert.Equal(t, &Order{
 		ID: OrderID{
 			Hi: 0x0000000000000840,

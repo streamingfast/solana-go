@@ -17,10 +17,10 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/dfuse-io/solana-go"
-	"github.com/dfuse-io/solana-go/programs/token"
 	"github.com/ryanuber/columnize"
 	"github.com/spf13/cobra"
+	"github.com/streamingfast/solana-go"
+	"github.com/streamingfast/solana-go/programs/token"
 )
 
 var tokenGetMintCmd = &cobra.Command{

@@ -1,8 +1,8 @@
 package ws
 
 import (
-	"github.com/dfuse-io/solana-go"
-	"github.com/dfuse-io/solana-go/rpc"
+	"github.com/streamingfast/solana-go"
+	"github.com/streamingfast/solana-go/rpc"
 )
 
 var base64Conf = map[string]interface{}{

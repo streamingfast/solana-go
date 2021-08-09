@@ -24,9 +24,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/dfuse-io/solana-go/rpc"
 	"github.com/gorilla/rpc/v2/json2"
 	"github.com/gorilla/websocket"
+	"github.com/streamingfast/solana-go/rpc"
 	"github.com/tidwall/gjson"
 	"go.uber.org/zap"
 )

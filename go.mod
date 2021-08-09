@@ -1,15 +1,12 @@
-module github.com/dfuse-io/solana-go
+module github.com/streamingfast/solana-go
 
-go 1.14
+go 1.15
 
 require (
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.4 // indirect
 	github.com/GeertJohan/go.rice v1.0.0
-	github.com/dfuse-io/binary v0.0.0-20210216024852-4ae6830a495d
-	github.com/dfuse-io/dfuse-solana v0.0.0-20210215142939-a2baa3503463 // indirect
 	github.com/dfuse-io/logging v0.0.0-20210109005628-b97a57253f70
 	github.com/fatih/color v1.7.0
-	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/google/go-cmp v0.5.1
 	github.com/gorilla/rpc v1.2.0
 	github.com/gorilla/websocket v1.4.2
@@ -23,6 +20,7 @@ require (
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.7.1
+	github.com/streamingfast/binary v0.0.0-20210809212148-fe6580164efb
 	github.com/stretchr/testify v1.6.1
 	github.com/teris-io/shortid v0.0.0-20201117134242-e59966efd125 // indirect
 	github.com/tidwall/gjson v1.6.7

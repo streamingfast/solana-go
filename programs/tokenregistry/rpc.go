@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/dfuse-io/solana-go"
-	"github.com/dfuse-io/solana-go/rpc"
+	"github.com/streamingfast/solana-go"
+	"github.com/streamingfast/solana-go/rpc"
 )
 
 func GetTokenRegistryEntry(ctx context.Context, rpcCli *rpc.Client, mintAddress solana.PublicKey) (*TokenMeta, error) {

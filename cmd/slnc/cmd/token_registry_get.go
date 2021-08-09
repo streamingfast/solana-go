@@ -18,12 +18,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/dfuse-io/solana-go/rpc"
+	"github.com/streamingfast/solana-go/rpc"
 
-	"github.com/dfuse-io/solana-go"
-	"github.com/dfuse-io/solana-go/programs/tokenregistry"
-	"github.com/dfuse-io/solana-go/text"
 	"github.com/spf13/cobra"
+	"github.com/streamingfast/solana-go"
+	"github.com/streamingfast/solana-go/programs/tokenregistry"
+	"github.com/streamingfast/solana-go/text"
 )
 
 var tokenRegistryGetCmd = &cobra.Command{

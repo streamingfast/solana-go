@@ -19,14 +19,14 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/dfuse-io/solana-go"
-	_ "github.com/dfuse-io/solana-go/programs/serum"
-	_ "github.com/dfuse-io/solana-go/programs/system"
-	_ "github.com/dfuse-io/solana-go/programs/token"
-	_ "github.com/dfuse-io/solana-go/programs/tokenregistry"
-	"github.com/dfuse-io/solana-go/rpc"
-	"github.com/dfuse-io/solana-go/text"
 	"github.com/spf13/cobra"
+	"github.com/streamingfast/solana-go"
+	_ "github.com/streamingfast/solana-go/programs/serum"
+	_ "github.com/streamingfast/solana-go/programs/system"
+	_ "github.com/streamingfast/solana-go/programs/token"
+	_ "github.com/streamingfast/solana-go/programs/tokenregistry"
+	"github.com/streamingfast/solana-go/rpc"
+	"github.com/streamingfast/solana-go/text"
 )
 
 var getTransactionsCmd = &cobra.Command{

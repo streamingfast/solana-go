@@ -15,8 +15,8 @@
 package rpc
 
 import (
-	bin "github.com/dfuse-io/binary"
-	"github.com/dfuse-io/solana-go"
+	bin "github.com/streamingfast/binary"
+	"github.com/streamingfast/solana-go"
 )
 
 type Context struct {
@@ -120,6 +120,14 @@ type GetConfirmedSignaturesForAddress2Opts struct {
 }
 
 type GetConfirmedSignaturesForAddress2Result []*TransactionSignature
+
+type GetSignaturesForAddressOpts struct {
+	Limit  uint64 `json:"limit,omitempty"`
+	Before string `json:"before,omitempty"`
+	Until  string `json:"until,omitempty"`
+}
+
+type GetSignaturesForAddressResult []*TransactionSignature
 
 type RPCFilter struct {
 	Memcmp   *RPCFilterMemcmp `json:"memcmp,omitempty"`

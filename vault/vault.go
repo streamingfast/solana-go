@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/dfuse-io/solana-go"
+	"github.com/streamingfast/solana-go"
 )
 
 // Vault represents a `solana-go` wallet.  It contains the encrypted

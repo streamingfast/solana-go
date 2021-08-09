@@ -19,11 +19,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/dfuse-io/solana-go/text"
-
-	"github.com/dfuse-io/solana-go"
-
 	"github.com/spf13/cobra"
+	"github.com/streamingfast/solana-go"
+	"github.com/streamingfast/solana-go/text"
 )
 
 var getProgramAccountsCmd = &cobra.Command{

@@ -19,9 +19,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/dfuse-io/solana-go"
-	"github.com/dfuse-io/solana-go/rpc"
 	"github.com/spf13/cobra"
+	"github.com/streamingfast/solana-go"
+	"github.com/streamingfast/solana-go/rpc"
 )
 
 var requestCmd = &cobra.Command{

@@ -21,10 +21,10 @@ import (
 	"fmt"
 
 	rice "github.com/GeertJohan/go.rice"
-	bin "github.com/dfuse-io/binary"
-	"github.com/dfuse-io/solana-go"
-	"github.com/dfuse-io/solana-go/rpc"
-	"github.com/dfuse-io/solana-go/rpc/ws"
+	bin "github.com/streamingfast/binary"
+	"github.com/streamingfast/solana-go"
+	"github.com/streamingfast/solana-go/rpc"
+	"github.com/streamingfast/solana-go/rpc/ws"
 	"go.uber.org/zap"
 )
 

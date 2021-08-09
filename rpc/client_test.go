@@ -19,8 +19,8 @@ import (
 	"encoding/json"
 	"testing"
 
-	bin "github.com/dfuse-io/binary"
-	"github.com/dfuse-io/solana-go"
+	bin "github.com/streamingfast/binary"
+	"github.com/streamingfast/solana-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -21,13 +21,13 @@ import (
 	"os"
 	"testing"
 
-	"github.com/dfuse-io/solana-go/rpc/ws"
+	"github.com/streamingfast/solana-go/rpc/ws"
 
-	"github.com/dfuse-io/solana-go/rpc"
+	"github.com/streamingfast/solana-go/rpc"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/dfuse-io/solana-go"
+	"github.com/streamingfast/solana-go"
 )
 
 func TestFetchMarket(t *testing.T) {

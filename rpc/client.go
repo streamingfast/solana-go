@@ -22,8 +22,8 @@ import (
 	"fmt"
 	"net/http"
 
-	bin "github.com/dfuse-io/binary"
-	"github.com/dfuse-io/solana-go"
+	bin "github.com/streamingfast/binary"
+	"github.com/streamingfast/solana-go"
 	"github.com/ybbus/jsonrpc"
 )
 
@@ -132,6 +132,13 @@ func (c *Client) GetConfirmedSignaturesForAddress2(ctx context.Context, address 
 	params := []interface{}{address.String(), opts}
 
 	err = c.rpcClient.CallFor(&out, "getConfirmedSignaturesForAddress2", params...)
+	return
+}
+
+func (c *Client) GetSignaturesForAddress(ctx context.Context, address solana.PublicKey, opts *GetSignaturesForAddressOpts) (out GetSignaturesForAddressResult, err error) {
+	params := []interface{}{address.String(), opts}
+
+	err = c.rpcClient.CallFor(&out, "getSignaturesForAddress", params...)
 	return
 }
 

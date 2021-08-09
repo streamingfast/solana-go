@@ -17,8 +17,8 @@ package serum
 import (
 	"strings"
 
-	bin "github.com/dfuse-io/binary"
-	"github.com/dfuse-io/solana-go"
+	bin "github.com/streamingfast/binary"
+	"github.com/streamingfast/solana-go"
 )
 
 type RequestQueue struct {
@@ -148,22 +148,26 @@ func (r RequestFlag) IsDecrementTakeOnSelfTrade() bool {
 
 // Size 80 byte
 type Request struct {
-	RequestFlags         RequestFlag
+	Flag                 RequestFlag
 	OwnerSlot            uint8
 	FeeTier              uint8
 	SelfTradeBehavior    uint8
 	Padding              [4]byte    `json:"-"`
 	MaxCoinQtyOrCancelId bin.Uint64 //the max amount you wish to buy or sell
 	NativePCQtyLocked    bin.Uint64
-	OrderID              bin.Uint128
+	OrderID              OrderID
 	OpenOrders           [4]bin.Uint64 // this is the openOrder address
 	ClientOrderID        bin.Uint64
 }
 
+func (r *Request) Side() Side {
+	if Has(uint8(r.Flag), uint8(RequestFlagBid)) {
+		return SideBid
+	}
+	return SideAsk
+}
+
 func (r *Request) Equal(other *Request) bool {
-	//return (r.OrderID.Hi == other.OrderID.Hi && r.OrderID.Lo == other.OrderID.Lo) &&
-	//	(r.MaxCoinQtyOrCancelId == other.MaxCoinQtyOrCancelId) &&
-	//	(r.NativePCQtyLocked == other.NativePCQtyLocked)
 	return (r.OrderID.Hi == other.OrderID.Hi && r.OrderID.Lo == other.OrderID.Lo) &&
 		(r.MaxCoinQtyOrCancelId == other.MaxCoinQtyOrCancelId) &&
 		(r.NativePCQtyLocked == other.NativePCQtyLocked)
