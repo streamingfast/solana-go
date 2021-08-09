@@ -22,8 +22,8 @@ import (
 	"fmt"
 	"net/http"
 
-	bin "github.com/dfuse-io/binary"
-	"github.com/dfuse-io/solana-go"
+	bin "github.com/streamingfast/binary"
+	"github.com/streamingfast/solana-go"
 	"github.com/ybbus/jsonrpc"
 )
 

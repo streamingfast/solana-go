@@ -1,4 +1,6 @@
-# Solana library for Go
+#  StreamingFast Solana library for Go
+[![reference](https://img.shields.io/badge/godoc-reference-5272B4.svg?style=flat-square)](https://pkg.go.dev/github.com/streamingfast/solana-go)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 Go library to interface with Solana nodes's JSON-RPC interface, Solana's SPL tokens and the
 [Serum DEX](https://dex.projectserum.com) instructions.  More contracts to come.
@@ -7,19 +9,19 @@ Go library to interface with Solana nodes's JSON-RPC interface, Solana's SPL tok
 
 > :warning: `solana-go` works using SemVer but in 0 version, which means that the 'minor' will be changed when some broken changes are introduced into the application, and the 'patch' will be changed when a new feature with new changes is added or for bug fixing. As soon as v1.0.0 be released, `solana-go` will start to use SemVer as usual.
 
-1. Install from https://github.com/dfuse-io/solana-go/releases
+1. Install from https://github.com/streamingfast/solana-go/releases
 
 **or**
 
 2. Install using Homebrew on macOS
 ```bash
-$ brew install dfuse-io/tap/solana-go
+$ brew install streamingfast/tap/solana-go
 ```
 
 3. Build from source with:
 
 ```bash
-$ go get -u -v github.com/dfuse-io/solana-go/cmd/slnc
+$ go get -u -v github.com/streamingfast/solana-go/cmd/slnc
 ```
 
 # Command-line
@@ -88,8 +90,8 @@ Loading an SPL mint
 
 ```golang
 
-import "github.com/dfuse-io/solana-go/rpc"
-import "github.com/dfuse-io/solana-go/token"
+import "github.com/streamingfast/solana-go/rpc"
+import "github.com/streamingfast/solana-go/token"
 
 	addr := solana.MustPublicKeyFromBase58("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
 	cli := rpc.NewClient("http://api.mainnet-beta.solana.com/rpc")
@@ -111,8 +113,8 @@ Getting any account's data:
 
 ```golang
 
-import "github.com/dfuse-io/solana-go/rpc"
-import "github.com/dfuse-io/solana-go/token"
+import "github.com/streamingfast/solana-go/rpc"
+import "github.com/streamingfast/solana-go/token"
 
 	addr := solana.MustPublicKeyFromBase58("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
 	cli := rpc.NewClient("http://api.mainnet-beta.solana.com/rpc")
@@ -139,10 +141,20 @@ import "github.com/dfuse-io/solana-go/token"
 
 ```
 
-# Contributing
+## Contributing
 
-Any contributions are welcome, use your standard GitHub-fu to pitch in and improve.
+**Issues and PR in this repo related strictly to the solana go library.**
 
-# License
+Report any protocol-specific issues in their
+[respective repositories](https://github.com/streamingfast/streamingfast#protocols)
+
+**Please first refer to the general
+[StreamingFast contribution guide](https://github.com/streamingfast/streamingfast/blob/master/CONTRIBUTING.md)**,
+if you wish to contribute to this code base.
+
+This codebase uses unit tests extensively, please write and run tests.
+
+
+## License
 
 [Apache 2.0](LICENSE)

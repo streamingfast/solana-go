@@ -20,8 +20,8 @@ import (
 )
 
 var zlog *zap.Logger
-var traceEnabled = logging.IsTraceEnabled("solana-go", "github.com/dfuse-io/solana-go/rpc/ws")
+var traceEnabled = logging.IsTraceEnabled("solana-go", "github.com/streamingfast/solana-go/rpc/ws")
 
 func init() {
-	logging.Register("github.com/dfuse-io/solana-go/rpc/ws", &zlog)
+	logging.Register("github.com/streamingfast/solana-go/rpc/ws", &zlog)
 }

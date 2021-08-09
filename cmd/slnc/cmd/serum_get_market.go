@@ -20,11 +20,11 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/dfuse-io/solana-go"
-	"github.com/dfuse-io/solana-go/programs/serum"
-	"github.com/dfuse-io/solana-go/rpc"
 	"github.com/ryanuber/columnize"
 	"github.com/spf13/cobra"
+	"github.com/streamingfast/solana-go"
+	"github.com/streamingfast/solana-go/programs/serum"
+	"github.com/streamingfast/solana-go/rpc"
 )
 
 var serumGetMarketCmd = &cobra.Command{

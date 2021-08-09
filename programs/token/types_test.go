@@ -21,10 +21,10 @@ import (
 	"os"
 	"testing"
 
-	bin "github.com/dfuse-io/binary"
-	"github.com/dfuse-io/solana-go"
-	"github.com/dfuse-io/solana-go/rpc"
 	"github.com/mr-tron/base58"
+	bin "github.com/streamingfast/binary"
+	"github.com/streamingfast/solana-go"
+	"github.com/streamingfast/solana-go/rpc"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

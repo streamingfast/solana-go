@@ -19,12 +19,12 @@ import (
 	"log"
 	"os"
 
-	bin "github.com/dfuse-io/binary"
-	"github.com/dfuse-io/solana-go"
-	"github.com/dfuse-io/solana-go/programs/token"
-	"github.com/dfuse-io/solana-go/rpc"
-	"github.com/dfuse-io/solana-go/text"
 	"github.com/spf13/cobra"
+	bin "github.com/streamingfast/binary"
+	"github.com/streamingfast/solana-go"
+	"github.com/streamingfast/solana-go/programs/token"
+	"github.com/streamingfast/solana-go/rpc"
+	"github.com/streamingfast/solana-go/text"
 )
 
 var getSPLTokenCmd = &cobra.Command{

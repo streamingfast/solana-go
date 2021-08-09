@@ -17,8 +17,8 @@ package serum
 import (
 	"strings"
 
-	bin "github.com/dfuse-io/binary"
-	"github.com/dfuse-io/solana-go"
+	bin "github.com/streamingfast/binary"
+	"github.com/streamingfast/solana-go"
 )
 
 type RequestQueue struct {

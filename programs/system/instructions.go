@@ -19,9 +19,9 @@ import (
 	"encoding/binary"
 	"fmt"
 
-	bin "github.com/dfuse-io/binary"
-	solana "github.com/dfuse-io/solana-go"
-	"github.com/dfuse-io/solana-go/text"
+	bin "github.com/streamingfast/binary"
+	solana "github.com/streamingfast/solana-go"
+	"github.com/streamingfast/solana-go/text"
 )
 
 var PROGRAM_ID = solana.MustPublicKeyFromBase58("11111111111111111111111111111111")

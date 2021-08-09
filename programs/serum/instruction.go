@@ -4,9 +4,9 @@ import (
 	"encoding/binary"
 	"fmt"
 
-	bin "github.com/dfuse-io/binary"
-	"github.com/dfuse-io/solana-go"
-	"github.com/dfuse-io/solana-go/text"
+	bin "github.com/streamingfast/binary"
+	"github.com/streamingfast/solana-go"
+	"github.com/streamingfast/solana-go/text"
 )
 
 func init() {

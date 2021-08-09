@@ -21,7 +21,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/dfuse-io/solana-go/rpc/ws"
+	"github.com/streamingfast/solana-go/rpc/ws"
 
 	"github.com/dfuse-io/solana-go/rpc"
 

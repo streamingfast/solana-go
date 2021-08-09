@@ -3,8 +3,8 @@ package token
 import (
 	"fmt"
 
-	bin "github.com/dfuse-io/binary"
 	"github.com/dfuse-io/solana-go"
+	bin "github.com/streamingfast/binary"
 )
 
 // Token contract interface

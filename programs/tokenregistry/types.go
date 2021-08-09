@@ -16,9 +16,9 @@ package tokenregistry
 import (
 	"fmt"
 
-	bin "github.com/dfuse-io/binary"
+	bin "github.com/streamingfast/binary"
 
-	"github.com/dfuse-io/solana-go"
+	"github.com/streamingfast/solana-go"
 )
 
 const TOKEN_META_SIZE = 229

@@ -20,8 +20,8 @@ import (
 )
 
 var zlog = zap.NewNop()
-var traceEnabled = logging.IsTraceEnabled("solana-go", "github.com/dfuse-io/solana-go/program/serum")
+var traceEnabled = logging.IsTraceEnabled("solana-go", "github.com/streamingfast/solana-go/program/serum")
 
 func init() {
-	logging.Register("github.com/dfuse-io/solana-go/program/serum", &zlog)
+	logging.Register("github.com/streamingfast/solana-go/program/serum", &zlog)
 }

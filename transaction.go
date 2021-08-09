@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sort"
 
-	bin "github.com/dfuse-io/binary"
+	bin "github.com/streamingfast/binary"
 	"go.uber.org/zap"
 )
 

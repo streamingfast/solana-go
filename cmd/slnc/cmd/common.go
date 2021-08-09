@@ -19,10 +19,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/dfuse-io/solana-go/rpc"
+	"github.com/streamingfast/solana-go/rpc"
 
-	"github.com/dfuse-io/solana-go/vault"
 	"github.com/spf13/viper"
+	"github.com/streamingfast/solana-go/vault"
 )
 
 func getClient() *rpc.Client {

@@ -17,12 +17,12 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/dfuse-io/solana-go"
+	"github.com/streamingfast/solana-go"
 
-	"github.com/dfuse-io/solana-go/cli"
-	"github.com/dfuse-io/solana-go/vault"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/streamingfast/solana-go/cli"
+	"github.com/streamingfast/solana-go/vault"
 )
 
 var vaultAddCmd = &cobra.Command{
