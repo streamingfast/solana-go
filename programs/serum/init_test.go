@@ -21,7 +21,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/dfuse-io/logging"
+	"github.com/streamingfast/logging"
 	"github.com/klauspost/compress/zstd"
 	"github.com/stretchr/testify/require"
 )

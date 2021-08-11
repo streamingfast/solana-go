@@ -66,11 +66,9 @@ github.com/daaku/go.zipexe v1.0.0/go.mod h1:z8IiR6TsVLEYKwXAoE/I+8ys/sDkgTzSL0CL
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/dfuse-io/logging v0.0.0-20201110202154-26697de88c79/go.mod h1:V+ED4kT/t/lKtH99JQmKIb0v9WL3VaYkJ36CfHlVECI=
-github.com/dfuse-io/logging v0.0.0-20210109005628-b97a57253f70 h1:CuJS05R9jmNlUK8GOxrEELPbfXm0EuGh/30LjkjN5vo=
-github.com/dfuse-io/logging v0.0.0-20210109005628-b97a57253f70/go.mod h1:EoK/8RFbMEteaCaz89uessDTnCWjbbcr+DXcBh4el5o=
-github.com/streamingfast/solana-go v0.2.0 h1:i7HzMR2b3nexyT0i+G7YeBDZFzzMbD+tEgHKsfmc7oo=
-github.com/streamingfast/solana-go v0.2.0/go.mod h1:JmxX8KYNWRCwg1RyADE2kersXSNqE1KLt+w5nEq353g=
+github.com/streamingfast/logging v0.0.0-20201110202154-26697de88c79/go.mod h1:V+ED4kT/t/lKtH99JQmKIb0v9WL3VaYkJ36CfHlVECI=
+github.com/streamingfast/logging v0.0.0-20210109005628-b97a57253f70 h1:CuJS05R9jmNlUK8GOxrEELPbfXm0EuGh/30LjkjN5vo=
+github.com/streamingfast/logging v0.0.0-20210109005628-b97a57253f70/go.mod h1:EoK/8RFbMEteaCaz89uessDTnCWjbbcr+DXcBh4el5o=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/dgryski/go-sip13 v0.0.0-20181026042036-e10d5fee7954/go.mod h1:vAd38F8PWV+bWy6jNmig1y/TA+kYO4g3RSRF0IAv0no=
 github.com/envoyproxy/go-control-plane v0.9.0/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
@@ -276,6 +274,12 @@ github.com/streamingfast/binary v0.0.0-20210216024852-4ae6830a495d h1:EvEAQZ38ol
 github.com/streamingfast/binary v0.0.0-20210216024852-4ae6830a495d/go.mod h1:GDFX6qH3BQZPWTeYaA4ZW98T94zs2skRoG3oMz/0jw0=
 github.com/streamingfast/binary v0.0.0-20210809212148-fe6580164efb h1:l7NvlUZKVchkjz94iCXZ1BlOuGZyBWoYZSHmn0l/bCU=
 github.com/streamingfast/binary v0.0.0-20210809212148-fe6580164efb/go.mod h1:h35LJFc8/xH1K2C2JR07BIJFYKbrHo+pV0uEAYgzBto=
+github.com/streamingfast/binary v0.0.0-20210811183519-94786c01e70d h1:yiBVfO9ic8fXq3O++A7zyTTFkmvAr8qiUjeO/2mbEeY=
+github.com/streamingfast/binary v0.0.0-20210811183519-94786c01e70d/go.mod h1:Bz888jjbIPEa2rGi8p0mZerwjR3tbSOTLzp4c/PYpVw=
+github.com/streamingfast/logging v0.0.0-20210811175431-f3b44b61606a h1:Hy7ST3+wGmk4nyBanXKzhRXE63E77UEF93oG51dfq6c=
+github.com/streamingfast/logging v0.0.0-20210811175431-f3b44b61606a/go.mod h1:4GdqELhZOXj4xwc4IaBmzofzdErGynnaSzuzxy0ZIBo=
+github.com/streamingfast/solana-go v0.2.0 h1:i7HzMR2b3nexyT0i+G7YeBDZFzzMbD+tEgHKsfmc7oo=
+github.com/streamingfast/solana-go v0.2.0/go.mod h1:JmxX8KYNWRCwg1RyADE2kersXSNqE1KLt+w5nEq353g=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=

@@ -66,7 +66,7 @@ func TestAccount(t *testing.T) {
 }
 
 func TestMint(t *testing.T) {
-
+	t.Skip("skipping network call")
 	addr := solana.MustPublicKeyFromBase58("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
 	cli := rpc.NewClient("http://api.mainnet-beta.solana.com/rpc")
 
@@ -83,7 +83,7 @@ func TestMint(t *testing.T) {
 }
 
 func TestRawMint(t *testing.T) {
-
+	t.Skip("skipping network call")
 	addr := solana.MustPublicKeyFromBase58("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
 	cli := rpc.NewClient("http://api.mainnet-beta.solana.com/rpc")
 
