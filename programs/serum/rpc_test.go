@@ -33,7 +33,7 @@ import (
 func TestFetchMarket(t *testing.T) {
 	rpcURL := os.Getenv("RPC_URL")
 	if rpcURL == "" {
-		t.Skip("Setup 'RPC_URL' to run test i.e. 'http://api.mainnet-beta.solana.com:80/rpc'")
+		t.Skip("Setup 'RPC_URL' to run test i.e. 'https://api.mainnet-beta.solana.com:80/rpc'")
 		return
 	}
 

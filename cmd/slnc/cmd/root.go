@@ -29,7 +29,7 @@ import (
 // Version represents the cmd command version
 var Version string
 
-const defaultRPCURL = "http://api.mainnet-beta.solana.com/rpc"
+const defaultRPCURL = "https://api.mainnet-beta.solana.com"
 
 // RootCmd represents the eosc command
 var RootCmd = &cobra.Command{
