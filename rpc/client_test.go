@@ -28,7 +28,7 @@ import (
 func TestClient_GetAccountInfo(t *testing.T) {
 	server, closer := mockJSONRPC(t, json.RawMessage(`{"jsonrpc":"2.0","result":{"context":{"slot":1},"value":{"data":["dGVzdA==","base64"]}},"id":0}`))
 	defer closer()
-	client := NewClient(server.URL)
+	client := newTestClient(server.URL)
 
 	pubKey := solana.MustPublicKeyFromBase58("7xLk17EQQ5KLDLDe44wCmupJKJjTGd8hs3eSVVhCx932")
 	out, err := client.GetAccountInfo(context.Background(), pubKey)
@@ -45,7 +45,7 @@ func TestClient_GetAccountInfo(t *testing.T) {
 func TestClient_GetConfirmedSignaturesForAddress2(t *testing.T) {
 	server, closer := mockJSONRPC(t, json.RawMessage(`{"jsonrpc":"2.0","result":[{"err":null,"memo":null,"signature":"mgw5vw4tnbou1wVStKckVcVncbpRwfZPcMNbVBoigbSPXBMa3857CNzhwoCkRzM5K7nG32wcbpVJDHttQeBRaHB","slot":1}],"id":0}`))
 	defer closer()
-	client := NewClient(server.URL)
+	client := newTestClient(server.URL)
 
 	account := solana.MustPublicKeyFromBase58("H7ATJQGhwG8Uf8sUntUognFpsKixPy2buFnXkvyNbGUb")
 	out, err := client.GetConfirmedSignaturesForAddress2(context.Background(), account, &GetConfirmedSignaturesForAddress2Opts{Limit: 1})
@@ -66,7 +66,7 @@ func TestClient_GetConfirmedSignaturesForAddress2(t *testing.T) {
 func TestClient_GetConfirmedTransaction(t *testing.T) {
 	server, closer := mockJSONRPC(t, json.RawMessage(`{"jsonrpc":"2.0","result":{"meta":{"err":null,"fee":5000,"innerInstructions":[],"logMessages":[],"postBalances":[],"preBalances":[],"status":{"Ok":null}},"slot":48291656,"transaction":{"message":{"accountKeys":["GKu2xfGZopa8C9K11wduQWgP4W4H7EEcaNdsUb7mxhyr"],"header":{"numReadonlySignedAccounts":0,"numReadonlyUnsignedAccounts":3,"numRequiredSignatures":1},"instructions":[{"accounts":[1,2,3,0],"data":"3yZe7d","programIdIndex":4}],"recentBlockhash":"uoEAQCWCKjV9ecsBvngctJ7upNBZX7hpN4SfdR6TaUz"},"signatures":["53hoZ98EsCMA6L63GWM65M3Bd3WqA4LxD8bcJkbKoKWhbJFqX9M1WZ4fSjt8bYyZn21NwNnV2A25zirBni9Qk6LR"]}},"id":0}`))
 	defer closer()
-	client := NewClient(server.URL)
+	client := newTestClient(server.URL)
 
 	out, err := client.GetConfirmedTransaction(context.Background(), "53hoZ98EsCMA6L63GWM65M3Bd3WqA4LxD8bcJkbKoKWhbJFqX9M1WZ4fSjt8bYyZn21NwNnV2A25zirBni9Qk6LR")
 	require.NoError(t, err)
@@ -98,7 +98,7 @@ func TestClient_GetConfirmedTransaction(t *testing.T) {
 func TestClient_getMinimumBalanceForRentExemption(t *testing.T) {
 	server, closer := mockJSONRPC(t, json.RawMessage(`{"jsonrpc":"2.0","result":1586880,"id":0}`))
 	defer closer()
-	client := NewClient(server.URL)
+	client := newTestClient(server.URL)
 
 	out, err := client.GetMinimumBalanceForRentExemption(context.Background(), 100)
 	require.NoError(t, err)
@@ -109,4 +109,13 @@ func TestClient_getMinimumBalanceForRentExemption(t *testing.T) {
 
 	assert.Equal(t, int(1586880), out)
 
+}
+
+func newTestClient(url string) *Client {
+	client := NewClient(url)
+	client.requestIDGenerator = func() int {
+		return 0
+	}
+
+	return client
 }

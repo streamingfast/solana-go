@@ -19,9 +19,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/streamingfast/solana-go"
-
 	"github.com/spf13/cobra"
+	"github.com/streamingfast/solana-go"
 )
 
 var getAccountCmd = &cobra.Command{
