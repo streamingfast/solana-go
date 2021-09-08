@@ -100,7 +100,7 @@ func (c *Client) handleNewSubscriptionMessage(requestID, subID uint64) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
-	if traceEnabled {
+	if tracer.Enabled() {
 		zlog.Debug("received new subscription message",
 			zap.Uint64("message_id", requestID),
 			zap.Uint64("subscription_id", subID),
@@ -127,7 +127,7 @@ func (c *Client) handleNewSubscriptionMessage(requestID, subID uint64) {
 }
 
 func (c *Client) handleSubscriptionMessage(subID uint64, message []byte) {
-	if traceEnabled {
+	if tracer.Enabled() {
 		zlog.Debug("received subscription message",
 			zap.Uint64("subscription_id", subID),
 		)

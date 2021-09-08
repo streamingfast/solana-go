@@ -22,39 +22,35 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"github.com/streamingfast/logging"
+	"go.uber.org/zap"
 )
 
 // Version represents the cmd command version
 var Version string
 
-//const defaultRPCURL = "http://localhost:8899"
-const defaultRPCURL = "http://api.mainnet-beta.solana.com/rpc"
+const defaultRPCURL = "https://api.mainnet-beta.solana.com"
 
 // RootCmd represents the eosc command
 var RootCmd = &cobra.Command{
-	Use:   "cmd",
-	Short: "cmd is a client to Solana clusters - by dfuse.io",
+	Use:   "slnc",
+	Short: "A command-line client to Solana clusters - by StreamingFast (streamingfast.io)",
 }
 
-// Execute executes the configured RootCmd
-func Execute() {
-	if err := RootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-}
+var zlog *zap.Logger
+var tracer = logging.ApplicationLogger("slnc", "github.com/streamingfast/solana-go/cmd/slnc/cmd", &zlog)
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	// Not implemnted
-	//RootCmd.PersistentFlags().BoolP("debug", "", false, "Enables verbose API debug messages")
+
 	RootCmd.PersistentFlags().StringP("vault-file", "", "./solana-vault.json", "Wallet file that contains encrypted key material")
 	RootCmd.PersistentFlags().StringP("rpc-url", "u", defaultRPCURL, "API endpoint of eos.io blockchain node")
 	RootCmd.PersistentFlags().StringSliceP("http-header", "H", []string{}, "HTTP header to add to JSON-RPC requests")
 	RootCmd.PersistentFlags().StringP("kms-gcp-keypath", "", "", "Path to the cryptoKeys within a keyRing on GCP")
 
 	RootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
-		SetupLogger()
+		cmd.SilenceErrors = true
+		cmd.SilenceUsage = true
 		return nil
 	}
 }
@@ -65,6 +61,14 @@ func initConfig() {
 	replacer := strings.NewReplacer("-", "_")
 	viper.SetEnvKeyReplacer(replacer)
 	recurseViperCommands(RootCmd, nil)
+}
+
+// Execute executes the configured RootCmd
+func Execute() {
+	if err := RootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }
 
 func recurseViperCommands(root *cobra.Command, segments []string) {

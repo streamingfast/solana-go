@@ -21,25 +21,39 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/http/httputil"
+	"reflect"
+	"time"
 
 	bin "github.com/streamingfast/binary"
+	"github.com/streamingfast/logging"
 	"github.com/streamingfast/solana-go"
 	"github.com/ybbus/jsonrpc"
+	"go.uber.org/atomic"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 var ErrNotFound = errors.New("not found")
 
 type Client struct {
-	rpcURL    string
-	rpcClient jsonrpc.RPCClient
-	headers   http.Header
+	rpcURL             string
+	rpcClient          jsonrpc.RPCClient
+	headers            http.Header
+	requestIDGenerator func() int
 }
 
 func NewClient(rpcURL string) *Client {
-	rpcClient := jsonrpc.NewClient(rpcURL)
 	return &Client{
-		rpcURL:    rpcURL,
-		rpcClient: rpcClient,
+		rpcURL: rpcURL,
+		rpcClient: jsonrpc.NewClientWithOpts(rpcURL, &jsonrpc.RPCClientOpts{
+			HTTPClient: &http.Client{
+				Transport: &withLoggingRoundTripper{
+					defaultLogger: &zlog,
+					tracer:        tracer,
+				}},
+		}),
+		requestIDGenerator: generateRequestID,
 	}
 }
 
@@ -59,7 +73,7 @@ func (c *Client) GetBalance(ctx context.Context, publicKey string, commitment Co
 		params = append(params, commit)
 	}
 
-	err = c.rpcClient.CallFor(&out, "getBalance", params...)
+	err = c.callFor(&out, "getBalance", params...)
 	return
 }
 
@@ -72,7 +86,7 @@ func (c *Client) GetRecentBlockhash(ctx context.Context, commitment CommitmentTy
 		params = append(params, commit)
 	}
 
-	err = c.rpcClient.CallFor(&out, "getRecentBlockhash", params)
+	err = c.callFor(&out, "getRecentBlockhash", params)
 	return
 }
 
@@ -85,7 +99,7 @@ func (c *Client) GetSlot(ctx context.Context, commitment CommitmentType) (out Ge
 		params = append(params, commit)
 	}
 
-	err = c.rpcClient.CallFor(&out, "getSlot", params)
+	err = c.callFor(&out, "getSlot", params)
 	return
 }
 
@@ -95,7 +109,7 @@ func (c *Client) GetConfirmedBlock(ctx context.Context, slot uint64, encoding st
 	}
 	params := []interface{}{slot, encoding}
 
-	err = c.rpcClient.CallFor(&out, "getConfirmedBlock", params...)
+	err = c.callFor(&out, "getConfirmedBlock", params...)
 	return
 }
 
@@ -105,7 +119,7 @@ func (c *Client) GetAccountInfo(ctx context.Context, account solana.PublicKey) (
 	}
 	params := []interface{}{account, obj}
 
-	err = c.rpcClient.CallFor(&out, "getAccountInfo", params...)
+	err = c.callFor(&out, "getAccountInfo", params...)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +143,7 @@ func (c *Client) GetAccountDataIn(ctx context.Context, account solana.PublicKey,
 func (c *Client) GetConfirmedTransaction(ctx context.Context, signature string) (out TransactionWithMeta, err error) {
 	params := []interface{}{signature, "json"}
 
-	err = c.rpcClient.CallFor(&out, "getConfirmedTransaction", params...)
+	err = c.callFor(&out, "getConfirmedTransaction", params...)
 	return
 }
 
@@ -137,14 +151,14 @@ func (c *Client) GetConfirmedSignaturesForAddress2(ctx context.Context, address 
 
 	params := []interface{}{address.String(), opts}
 
-	err = c.rpcClient.CallFor(&out, "getConfirmedSignaturesForAddress2", params...)
+	err = c.callFor(&out, "getConfirmedSignaturesForAddress2", params...)
 	return
 }
 
 func (c *Client) GetSignaturesForAddress(ctx context.Context, address solana.PublicKey, opts *GetSignaturesForAddressOpts) (out GetSignaturesForAddressResult, err error) {
 	params := []interface{}{address.String(), opts}
 
-	err = c.rpcClient.CallFor(&out, "getSignaturesForAddress", params...)
+	err = c.callFor(&out, "getSignaturesForAddress", params...)
 	return
 }
 
@@ -163,13 +177,13 @@ func (c *Client) GetProgramAccounts(ctx context.Context, publicKey solana.Public
 
 	params := []interface{}{publicKey, obj}
 
-	err = c.rpcClient.CallFor(&out, "getProgramAccounts", params...)
+	err = c.callFor(&out, "getProgramAccounts", params...)
 	return
 }
 
 func (c *Client) GetMinimumBalanceForRentExemption(ctx context.Context, dataSize int) (lamport int, err error) {
 	params := []interface{}{dataSize}
-	err = c.rpcClient.CallFor(&lamport, "getMinimumBalanceForRentExemption", params...)
+	err = c.callFor(&lamport, "getMinimumBalanceForRentExemption", params...)
 	return
 }
 
@@ -196,7 +210,7 @@ func (c *Client) SimulateTransaction(ctx context.Context, transaction *solana.Tr
 	}
 
 	var out *SimulateTransactionResponse
-	if err := c.rpcClient.CallFor(&out, "simulateTransaction", params...); err != nil {
+	if err := c.callFor(&out, "simulateTransaction", params...); err != nil {
 		return nil, fmt.Errorf("send transaction: rpc send: %w", err)
 	}
 
@@ -223,7 +237,7 @@ func (c *Client) SendTransaction(ctx context.Context, transaction *solana.Transa
 		obj,
 	}
 
-	if err := c.rpcClient.CallFor(&signature, "sendTransaction", params...); err != nil {
+	if err := c.callFor(&signature, "sendTransaction", params...); err != nil {
 		return "", fmt.Errorf("send transaction: rpc send: %w", err)
 	}
 	return
@@ -241,8 +255,107 @@ func (c *Client) RequestAirdrop(ctx context.Context, account *solana.PublicKey, 
 		obj,
 	}
 
-	if err := c.rpcClient.CallFor(&signature, "requestAirdrop", params...); err != nil {
+	if err := c.callFor(&signature, "requestAirdrop", params...); err != nil {
 		return "", fmt.Errorf("send transaction: rpc send: %w", err)
 	}
 	return
+}
+
+func (c *Client) callFor(out interface{}, method string, params ...interface{}) error {
+	request := jsonrpc.NewRequest(method, params...)
+	request.ID = c.requestIDGenerator()
+
+	logger := zlog.With(zap.Int("id", request.ID), zap.String("method", method))
+	ctx := logging.WithLogger(context.Background(), logger)
+
+	fields := []zapcore.Field{}
+	if tracer.Enabled() {
+		fields = append(fields, zap.Reflect("params", params))
+	}
+	fields = append(fields, zapType("output", out))
+
+	startTime := time.Now()
+	decodingTime := time.Time{}
+
+	logger.Info("performing JSON-RPC call", fields...)
+	defer func() {
+		fields := []zapcore.Field{}
+		if !decodingTime.IsZero() {
+			fields = append(fields, zap.Duration("parsing", time.Since(decodingTime)))
+		}
+		fields = append(fields, zap.Duration("overall", time.Since(startTime)))
+
+		logger.Info("performed JSON-RPC call", fields...)
+	}()
+
+	// When `jsonrpc` library we use accepts `ctx contxt.Context` as first parameter in `CallCtxRaw` (or other name),
+	// replace with appropriate function that accept context value.
+	//
+	// See https://github.com/ybbus/jsonrpc/pull/39
+	_ = ctx
+	rpcResponse, err := c.rpcClient.CallRaw(request)
+	if err != nil {
+		return err
+	}
+
+	if rpcResponse.Error != nil {
+		return rpcResponse.Error
+	}
+
+	return rpcResponse.GetObject(out)
+}
+
+var requestCounter = atomic.NewInt64(0)
+
+func generateRequestID() int {
+	return int(requestCounter.Inc())
+}
+
+func zapType(key string, v interface{}) zap.Field {
+	return zap.Stringer(key, zapTypeWrapper{v})
+}
+
+type zapTypeWrapper struct {
+	v interface{}
+}
+
+func (w zapTypeWrapper) String() string {
+	return reflect.TypeOf(w.v).String()
+}
+
+type withLoggingRoundTripper struct {
+	defaultLogger **zap.Logger
+	tracer        logging.Tracer
+}
+
+func (t *withLoggingRoundTripper) RoundTrip(request *http.Request) (*http.Response, error) {
+	logger := logging.Logger(request.Context(), *t.defaultLogger)
+
+	debugEnabled := logger.Core().Enabled(zap.DebugLevel)
+	traceEnabled := t.tracer.Enabled()
+
+	if debugEnabled {
+		requestDump, err := httputil.DumpRequestOut(request, true)
+		if err != nil {
+			panic(fmt.Errorf("unexpecting that httputil.DumpRequestOut would panic: %w", err))
+		}
+
+		logger.Debug("JSON-RPC request\n" + string(requestDump))
+	}
+
+	response, err := http.DefaultTransport.RoundTrip(request)
+	if err != nil {
+		return nil, err
+	}
+
+	if debugEnabled {
+		responseDump, err := httputil.DumpResponse(response, traceEnabled)
+		if err != nil {
+			panic(fmt.Errorf("unexpecting that httputil.DumpRequestOut would panic: %w", err))
+		}
+
+		logger.Debug("JSON-RPC response\n" + string(responseDump))
+	}
+
+	return response, nil
 }

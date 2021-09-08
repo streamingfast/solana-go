@@ -16,11 +16,11 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 
 	bin "github.com/streamingfast/binary"
 	"github.com/streamingfast/solana-go"
 	"github.com/streamingfast/solana-go/programs/token"
+	"go.uber.org/zap"
 )
 
 func decode(owner solana.PublicKey, data []byte) (interface{}, error) {
@@ -47,7 +47,7 @@ func decodeAsToken(data []byte) (out interface{}, err error) {
 	case 40:
 		var mint token.Mint
 		if err := bin.NewDecoder(data).Decode(&mint); err != nil {
-			log.Fatalln("failed unpack", err)
+			zlog.Panic("failed unpack", zap.Error(err))
 		}
 
 		return mint, nil

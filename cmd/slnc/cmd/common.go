@@ -19,9 +19,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/streamingfast/solana-go/rpc"
-
 	"github.com/spf13/viper"
+	"github.com/streamingfast/solana-go/rpc"
 	"github.com/streamingfast/solana-go/vault"
 )
 
