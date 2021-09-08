@@ -65,9 +65,12 @@ func (c *Client) SetHeader(k, v string) {
 }
 
 func (c *Client) GetBalance(ctx context.Context, publicKey string, commitment CommitmentType) (out *GetBalanceResult, err error) {
+	commit := map[string]string{
+		"commitment": string(commitment),
+	}
 	params := []interface{}{publicKey}
 	if commitment != "" {
-		params = append(params, string(commitment))
+		params = append(params, commit)
 	}
 
 	err = c.callFor(&out, "getBalance", params...)
@@ -88,12 +91,15 @@ func (c *Client) GetRecentBlockhash(ctx context.Context, commitment CommitmentTy
 }
 
 func (c *Client) GetSlot(ctx context.Context, commitment CommitmentType) (out GetSlotResult, err error) {
+	commit := map[string]string{
+		"commitment": string(commitment),
+	}
 	var params []interface{}
 	if commitment != "" {
-		params = append(params, string(commitment))
+		params = append(params, commit)
 	}
 
-	err = c.callFor(&out, "getSlot", params...)
+	err = c.callFor(&out, "getSlot", params)
 	return
 }
 
