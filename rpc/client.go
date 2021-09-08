@@ -49,7 +49,7 @@ func NewClient(rpcURL string) *Client {
 		rpcClient: jsonrpc.NewClientWithOpts(rpcURL, &jsonrpc.RPCClientOpts{
 			HTTPClient: &http.Client{
 				Transport: &withLoggingRoundTripper{
-					defaultLogger: zlog,
+					defaultLogger: &zlog,
 					tracer:        tracer,
 				}},
 		}),
@@ -271,7 +271,7 @@ func (c *Client) callFor(out interface{}, method string, params ...interface{}) 
 	startTime := time.Now()
 	decodingTime := time.Time{}
 
-	logger.Debug("performing JSON-RPC call", fields...)
+	logger.Info("performing JSON-RPC call", fields...)
 	defer func() {
 		fields := []zapcore.Field{}
 		if !decodingTime.IsZero() {
@@ -279,11 +279,13 @@ func (c *Client) callFor(out interface{}, method string, params ...interface{}) 
 		}
 		fields = append(fields, zap.Duration("overall", time.Since(startTime)))
 
-		logger.Debug("performed JSON-RPC call", fields...)
+		logger.Info("performed JSON-RPC call", fields...)
 	}()
 
-	// When jsonrpc library we use accept context input, replace with appropriate
-	// function that accept context value.
+	// When `jsonrpc` library we use accepts `ctx contxt.Context` as first parameter in `CallCtxRaw` (or other name),
+	// replace with appropriate function that accept context value.
+	//
+	// See https://github.com/ybbus/jsonrpc/pull/39
 	_ = ctx
 	rpcResponse, err := c.rpcClient.CallRaw(request)
 	if err != nil {
@@ -316,14 +318,12 @@ func (w zapTypeWrapper) String() string {
 }
 
 type withLoggingRoundTripper struct {
-	defaultLogger *zap.Logger
+	defaultLogger **zap.Logger
 	tracer        logging.Tracer
 }
 
 func (t *withLoggingRoundTripper) RoundTrip(request *http.Request) (*http.Response, error) {
-	request.Header.Set("User-Agent", "curl/7.64.1")
-
-	logger := logging.Logger(request.Context(), t.defaultLogger)
+	logger := logging.Logger(request.Context(), *t.defaultLogger)
 
 	debugEnabled := logger.Core().Enabled(zap.DebugLevel)
 	traceEnabled := t.tracer.Enabled()
