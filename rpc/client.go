@@ -218,7 +218,8 @@ func (c *Client) SimulateTransaction(ctx context.Context, transaction *solana.Tr
 
 }
 
-func (c *Client) SendTransaction(ctx context.Context, transaction *solana.Transaction) (signature string, err error) {
+func (c *Client) SendTransaction(ctx context.Context, transaction *solana.Transaction,
+	opts *SendTransactionOptions) (signature string, err error) {
 
 	buf := new(bytes.Buffer)
 
@@ -230,6 +231,14 @@ func (c *Client) SendTransaction(ctx context.Context, transaction *solana.Transa
 
 	obj := map[string]interface{}{
 		"encoding": "base64",
+	}
+	if opts != nil {
+		if opts.SkipPreflight {
+			obj["skipPreflight"] = opts.SkipPreflight
+		}
+		if opts.PreflightCommitment != "" {
+			obj["preflightCommitment"] = opts.PreflightCommitment
+		}
 	}
 
 	params := []interface{}{
