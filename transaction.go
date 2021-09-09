@@ -58,17 +58,17 @@ func NewTransaction(instructions []Instruction, blockHash PublicKey, opts ...Tra
 		}
 	}
 
-	programIDs := map[PublicKey]bool{}
+	programIDs := []PublicKey{}
 	accounts := []*AccountMeta{}
 	for _, instruction := range instructions {
 		for _, key := range instruction.Accounts() {
 			accounts = append(accounts, key)
 		}
-		programIDs[instruction.ProgramID()] = true
+		programIDs = append(programIDs, instruction.ProgramID())
 	}
 
 	// Add programID to the account list
-	for programID := range programIDs {
+	for _, programID := range programIDs {
 		accounts = append(accounts, &AccountMeta{
 			PublicKey:  programID,
 			IsSigner:   false,
@@ -77,7 +77,7 @@ func NewTransaction(instructions []Instruction, blockHash PublicKey, opts ...Tra
 	}
 
 	// Sort. Prioritizing first by signer, then by writable
-	sort.Slice(accounts, func(i, j int) bool {
+	sort.SliceStable(accounts, func(i, j int) bool {
 		return accounts[i].less(accounts[j])
 	})
 
@@ -119,6 +119,14 @@ func NewTransaction(instructions []Instruction, blockHash PublicKey, opts ...Tra
 		}
 		finalAccounts[itr] = uniqAccount
 		itr++
+	}
+	if feePayerIndex < 0 {
+		// fee payer is not part of accounts we want to add it
+		finalAccounts[0] = &AccountMeta{
+			PublicKey:  feePayer,
+			IsSigner:   true,
+			IsWritable: true,
+		}
 	}
 
 	message := Message{
