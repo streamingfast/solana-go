@@ -139,12 +139,25 @@ type RPCFilterMemcmp struct {
 	Bytes  solana.Base58 `json:"bytes"`
 }
 
+// CommitmentType is the level of commitment desired when querying state.
+// https://docs.solana.com/developing/clients/jsonrpc-api#configuring-state-commitment
 type CommitmentType string
 
 const (
-	CommitmentFinalized = CommitmentType("finalized") // the node will query the most recent block confirmed by supermajority of the cluster as having reached maximum lockout, meaning the cluster has recognized this block as finalized
-	CommitmentConfirmed = CommitmentType("confirmed") // the node will query the most recent block that has been voted on by supermajority of the cluster. It incorporates votes from gossip and replay. It does not count votes on descendants of a block, only direct votes on that block. This confirmation level also upholds "optimistic confirmation" guarantees in release 1.3 and onwards.
-	CommitmentProcessed = CommitmentType("processed") // the node will query the most recent block confirmed by supermajority of the cluster as having reached maximum lockout, meaning the cluster has recognized this block as finalized
+	// CommitmentProcessed queries the most recent block which has reached 1 confirmation by the connected node
+	CommitmentProcessed = CommitmentType("processed")
+	// CommitmentConfirmed queries the most recent block which has reached 1 confirmation by the cluster
+	CommitmentConfirmed = CommitmentType("confirmed")
+	// CommitmentConfirmed queries the most recent block which has been finalized by the cluster
+	CommitmentFinalized = CommitmentType("finalized")
+
+	// The following are deprecated
+
+	CommitmentMax          = CommitmentType("max")          // Deprecated as of v1.5.5
+	CommitmentRecent       = CommitmentType("recent")       // Deprecated as of v1.5.5
+	CommitmentRoot         = CommitmentType("root")         // Deprecated as of v1.5.5
+	CommitmentSingle       = CommitmentType("single")       // Deprecated as of v1.5.5
+	CommitmentSingleGossip = CommitmentType("singleGossip") // Deprecated as of v1.5.5
 )
 
 /// Parsed Transaction
@@ -181,4 +194,9 @@ type InstructionInfo struct {
 
 func (p *ParsedInstruction) IsParsed() bool {
 	return p.Parsed != nil
+}
+
+type SendTransactionOptions struct {
+	SkipPreflight       bool           // disable transaction verification step
+	PreflightCommitment CommitmentType // preflight commitment level; default: "finalized"
 }
