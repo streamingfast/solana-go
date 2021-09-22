@@ -61,7 +61,9 @@ func TestStreamOpenOrders(t *testing.T) {
 		t.Skip("Setup 'RPC_URL' to run test i.e. 'ws://api.mainnet-beta.solana.com:80/rpc'")
 		return
 	}
-	client, err := ws.Dial(context.Background(), rpcURL)
+
+	client := ws.NewClient(rpcURL)
+	err := client.Dial(context.Background())
 	require.NoError(t, err)
 
 	err = StreamOpenOrders(client)

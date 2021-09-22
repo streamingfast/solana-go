@@ -34,7 +34,7 @@ import (
 type result interface{}
 
 type Client struct {
-	rpcURL                  string
+	url                     string
 	conn                    *websocket.Conn
 	lock                    sync.RWMutex
 	subscriptionByRequestID map[uint64]*Subscription
@@ -42,16 +42,17 @@ type Client struct {
 	reconnectOnErr          bool
 }
 
-func Dial(ctx context.Context, rpcURL string) (c *Client, err error) {
-	c = &Client{
-		rpcURL:                  rpcURL,
+func NewClient(wsURL string) *Client {
+	return &Client{
+		url:                     wsURL,
 		subscriptionByRequestID: map[uint64]*Subscription{},
 		subscriptionByWSSubID:   map[uint64]*Subscription{},
 	}
+}
 
-	c.conn, _, err = websocket.DefaultDialer.DialContext(ctx, rpcURL, nil)
-	if err != nil {
-		return nil, fmt.Errorf("new ws client: dial: %w", err)
+func (c *Client) Dial(ctx context.Context) (err error) {
+	if c.conn, _, err = websocket.DefaultDialer.DialContext(ctx, c.url, nil); err != nil {
+		return fmt.Errorf("new ws client: dial: %w", err)
 	}
 
 	go func() {
@@ -64,7 +65,7 @@ func Dial(ctx context.Context, rpcURL string) (c *Client, err error) {
 		}
 	}()
 	go c.receiveMessages()
-	return c, nil
+	return nil
 }
 
 func (c *Client) Close() {
