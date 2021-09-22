@@ -144,11 +144,11 @@ type RPCFilterMemcmp struct {
 type CommitmentType string
 
 const (
-	// query the most recent block which has reached 1 confirmation by the connected node
+	// CommitmentProcessed queries the most recent block which has reached 1 confirmation by the connected node
 	CommitmentProcessed = CommitmentType("processed")
-	// query the most recent block which has reached 1 confirmation by the cluster
+	// CommitmentConfirmed queries the most recent block which has reached 1 confirmation by the cluster
 	CommitmentConfirmed = CommitmentType("confirmed")
-	// query the most recent block which has been finalized by the cluster
+	// CommitmentConfirmed queries the most recent block which has been finalized by the cluster
 	CommitmentFinalized = CommitmentType("finalized")
 
 	// The following are deprecated
