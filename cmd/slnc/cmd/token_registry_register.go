@@ -85,7 +85,7 @@ var tokenRegistryRegisterCmd = &cobra.Command{
 			return fmt.Errorf("registrar key must be present in the vault to register a token")
 		}
 
-		blockHashResult, err := client.GetRecentBlockhash(context.Background(), rpc.CommitmentMax)
+		blockHashResult, err := client.GetRecentBlockhash(context.Background(), rpc.CommitmentProcessed)
 		if err != nil {
 			return fmt.Errorf("unable retrieve recent block hash: %w", err)
 		}

@@ -42,7 +42,7 @@ var requestCmd = &cobra.Command{
 			return fmt.Errorf("invalid lamport value, expected a int value, got : %s", args[1])
 		}
 
-		airDrop, err := client.RequestAirdrop(context.Background(), &address, uint64(lamport), rpc.CommitmentMax)
+		airDrop, err := client.RequestAirdrop(context.Background(), &address, uint64(lamport), rpc.CommitmentProcessed)
 		if err != nil {
 			return fmt.Errorf("airdrop request failed: %w", err)
 		}
