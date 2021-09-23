@@ -69,32 +69,224 @@ const (
 	SideAsk
 )
 
+type Market interface {
+	GetAsks() solana.PublicKey
+	GetBids() solana.PublicKey
+
+	GetBaseMint() solana.PublicKey
+	GetBaseLotSize() uint64
+
+	GetQuoteMint() solana.PublicKey
+	GetQuoteLotSize() uint64
+
+	GetEventQueue() solana.PublicKey
+	GetRequestQueue() solana.PublicKey
+}
+
+type MarketV1 struct {
+	StartPadding       [5]byte `json:"-"`
+	AccountFlags       AccountFlag
+	OwnAddress         solana.PublicKey
+	VaultSignerNonce   bin.Uint64
+	BaseMint           solana.PublicKey
+	QuoteMint          solana.PublicKey
+	BaseVault          solana.PublicKey
+	BaseDepositsTotal  bin.Uint64
+	BaseFeesAccrued    bin.Uint64
+	QuoteVault         solana.PublicKey
+	QuoteDepositsTotal bin.Uint64
+	QuoteFeesAccrued   bin.Uint64
+	QuoteDustThreshold bin.Uint64
+	RequestQueue       solana.PublicKey
+	EventQueue         solana.PublicKey
+	Bids               solana.PublicKey
+	Asks               solana.PublicKey
+	BaseLotSize        bin.Uint64
+	QuoteLotSize       bin.Uint64
+	FeeRateBPS         bin.Uint64
+	EndPadding         [7]byte `json:"-"`
+}
+
+func (m *MarketV1) GetAsks() solana.PublicKey {
+	return m.Asks
+}
+
+func (m *MarketV1) GetBids() solana.PublicKey {
+	return m.Bids
+}
+
+func (m *MarketV1) GetBaseMint() solana.PublicKey {
+	return m.BaseMint
+}
+
+func (m *MarketV1) GetBaseLotSize() uint64 {
+	return uint64(m.BaseLotSize)
+}
+
+func (m *MarketV1) GetQuoteMint() solana.PublicKey {
+	return m.QuoteMint
+}
+
+func (m *MarketV1) GetQuoteLotSize() uint64 {
+	return uint64(m.QuoteLotSize)
+}
+
+func (m *MarketV1) GetEventQueue() solana.PublicKey {
+	return m.EventQueue
+}
+
+func (m *MarketV1) GetRequestQueue() solana.PublicKey {
+	return m.RequestQueue
+}
+
+func (m *MarketV1) Decode(in []byte) error {
+	decoder := bin.NewDecoder(in)
+	err := decoder.Decode(&m)
+	if err != nil {
+		return fmt.Errorf("unpack: %w", err)
+	}
+	return nil
+}
+
 type MarketV2 struct {
-	SerumPadding           [5]byte `json:"-"`
-	AccountFlags           AccountFlag
-	OwnAddress             solana.PublicKey
-	VaultSignerNonce       bin.Uint64
-	BaseMint               solana.PublicKey
-	QuoteMint              solana.PublicKey
-	BaseVault              solana.PublicKey
-	BaseDepositsTotal      bin.Uint64
-	BaseFeesAccrued        bin.Uint64
-	QuoteVault             solana.PublicKey
-	QuoteDepositsTotal     bin.Uint64
-	QuoteFeesAccrued       bin.Uint64
-	QuoteDustThreshold     bin.Uint64
-	RequestQueue           solana.PublicKey
-	EventQueue             solana.PublicKey
-	Bids                   solana.PublicKey
-	Asks                   solana.PublicKey
-	BaseLotSize            bin.Uint64
-	QuoteLotSize           bin.Uint64
-	FeeRateBPS             bin.Uint64
+	// V1
+	SerumPadding       [5]byte `json:"-"`
+	AccountFlags       AccountFlag
+	OwnAddress         solana.PublicKey
+	VaultSignerNonce   bin.Uint64
+	BaseMint           solana.PublicKey
+	QuoteMint          solana.PublicKey
+	BaseVault          solana.PublicKey
+	BaseDepositsTotal  bin.Uint64
+	BaseFeesAccrued    bin.Uint64
+	QuoteVault         solana.PublicKey
+	QuoteDepositsTotal bin.Uint64
+	QuoteFeesAccrued   bin.Uint64
+	QuoteDustThreshold bin.Uint64
+	RequestQueue       solana.PublicKey
+	EventQueue         solana.PublicKey
+	Bids               solana.PublicKey
+	Asks               solana.PublicKey
+	BaseLotSize        bin.Uint64
+	QuoteLotSize       bin.Uint64
+	FeeRateBPS         bin.Uint64
+
+	// V2
 	ReferrerRebatesAccrued bin.Uint64
-	EndPadding             [7]byte `json:"-"`
+
+	// V1
+	EndPadding [7]byte `json:"-"`
+}
+
+func (m *MarketV2) GetAsks() solana.PublicKey {
+	return m.Asks
+}
+
+func (m *MarketV2) GetBids() solana.PublicKey {
+	return m.Bids
+}
+
+func (m *MarketV2) GetBaseMint() solana.PublicKey {
+	return m.BaseMint
+}
+
+func (m *MarketV2) GetBaseLotSize() uint64 {
+	return uint64(m.BaseLotSize)
+}
+
+func (m *MarketV2) GetQuoteMint() solana.PublicKey {
+	return m.QuoteMint
+}
+
+func (m *MarketV2) GetQuoteLotSize() uint64 {
+	return uint64(m.QuoteLotSize)
+}
+
+func (m *MarketV2) GetEventQueue() solana.PublicKey {
+	return m.EventQueue
+}
+
+func (m *MarketV2) GetRequestQueue() solana.PublicKey {
+	return m.RequestQueue
 }
 
 func (m *MarketV2) Decode(in []byte) error {
+	decoder := bin.NewDecoder(in)
+	err := decoder.Decode(&m)
+	if err != nil {
+		return fmt.Errorf("unpack: %w", err)
+	}
+	return nil
+}
+
+type MarketV3 struct {
+	// V1
+	SerumPadding       [5]byte `json:"-"`
+	AccountFlags       AccountFlag
+	OwnAddress         solana.PublicKey
+	VaultSignerNonce   bin.Uint64
+	BaseMint           solana.PublicKey
+	QuoteMint          solana.PublicKey
+	BaseVault          solana.PublicKey
+	BaseDepositsTotal  bin.Uint64
+	BaseFeesAccrued    bin.Uint64
+	QuoteVault         solana.PublicKey
+	QuoteDepositsTotal bin.Uint64
+	QuoteFeesAccrued   bin.Uint64
+	QuoteDustThreshold bin.Uint64
+	RequestQueue       solana.PublicKey
+	EventQueue         solana.PublicKey
+	Bids               solana.PublicKey
+	Asks               solana.PublicKey
+	BaseLotSize        bin.Uint64
+	QuoteLotSize       bin.Uint64
+	FeeRateBPS         bin.Uint64
+
+	// V2
+	ReferrerRebatesAccrued bin.Uint64
+
+	// V3
+	Authority      solana.PublicKey
+	PruneAuthority solana.PublicKey
+	ReservedFuture [1024]byte `json:"-"`
+
+	// V1
+	EndPadding [7]byte `json:"-"`
+}
+
+func (m *MarketV3) GetAsks() solana.PublicKey {
+	return m.Asks
+}
+
+func (m *MarketV3) GetBids() solana.PublicKey {
+	return m.Bids
+}
+
+func (m *MarketV3) GetBaseMint() solana.PublicKey {
+	return m.BaseMint
+}
+
+func (m *MarketV3) GetBaseLotSize() uint64 {
+	return uint64(m.BaseLotSize)
+}
+
+func (m *MarketV3) GetQuoteMint() solana.PublicKey {
+	return m.QuoteMint
+}
+
+func (m *MarketV3) GetQuoteLotSize() uint64 {
+	return uint64(m.QuoteLotSize)
+}
+
+func (m *MarketV3) GetEventQueue() solana.PublicKey {
+	return m.EventQueue
+}
+
+func (m *MarketV3) GetRequestQueue() solana.PublicKey {
+	return m.RequestQueue
+}
+
+func (m *MarketV3) Decode(in []byte) error {
 	decoder := bin.NewDecoder(in)
 	err := decoder.Decode(&m)
 	if err != nil {

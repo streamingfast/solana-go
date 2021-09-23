@@ -28,7 +28,7 @@ type MarketMeta struct {
 	QuoteMint  token.Mint
 	BaseMint   token.Mint
 
-	MarketV2 MarketV2
+	Market Market
 }
 
 func (m *MarketMeta) baseSplTokenMultiplier() *big.Int {
@@ -40,23 +40,23 @@ func (m *MarketMeta) quoteSplTokenMultiplier() *big.Int {
 }
 
 func (m *MarketMeta) PriceLotsToNumber(price *big.Int) *big.Float {
-	ratio := I().Mul(I().SetInt64(int64(m.MarketV2.QuoteLotSize)), m.baseSplTokenMultiplier())
+	ratio := I().Mul(I().SetInt64(int64(m.Market.GetQuoteLotSize())), m.baseSplTokenMultiplier())
 	numerator := F().Mul(F().SetInt(price), F().SetInt(ratio))
-	denomiator := F().Mul(F().SetFloat64(float64(m.MarketV2.BaseLotSize)), F().SetInt(m.quoteSplTokenMultiplier()))
+	denomiator := F().Mul(F().SetFloat64(float64(m.Market.GetBaseLotSize())), F().SetInt(m.quoteSplTokenMultiplier()))
 	v := divideBnToNumber(numerator, denomiator)
 	return v
 }
 
 func (m *MarketMeta) BaseSizeLotsToNumber(size *big.Int) *big.Float {
-	numerator := I().Mul(size, I().SetInt64(int64(m.MarketV2.BaseLotSize)))
+	numerator := I().Mul(size, I().SetInt64(int64(m.Market.GetBaseLotSize())))
 	denomiator := m.baseSplTokenMultiplier()
 	return F().Quo(F().SetInt(numerator), F().SetInt(denomiator))
 }
 
 func (m *MarketMeta) PriceNumberToLots(price *big.Int) *big.Float {
 	numerator := I().Mul(price, m.quoteSplTokenMultiplier())
-	numerator = I().Mul(numerator, big.NewInt(int64(m.MarketV2.BaseLotSize)))
-	denomiator := I().Mul(m.baseSplTokenMultiplier(), I().SetInt64(int64(m.MarketV2.QuoteLotSize)))
+	numerator = I().Mul(numerator, big.NewInt(int64(m.Market.GetBaseLotSize())))
+	denomiator := I().Mul(m.baseSplTokenMultiplier(), I().SetInt64(int64(m.Market.GetQuoteLotSize())))
 	return F().Quo(F().SetInt(numerator), F().SetInt(denomiator))
 }
 

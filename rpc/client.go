@@ -218,9 +218,11 @@ func (c *Client) SimulateTransaction(ctx context.Context, transaction *solana.Tr
 
 }
 
-func (c *Client) SendTransaction(ctx context.Context, transaction *solana.Transaction,
-	opts *SendTransactionOptions) (signature string, err error) {
-
+func (c *Client) SendTransaction(
+	ctx context.Context,
+	transaction *solana.Transaction,
+	opts *SendTransactionOptions,
+) (signature string, err error) {
 	buf := new(bytes.Buffer)
 
 	if err := bin.NewEncoder(buf).Encode(transaction); err != nil {

@@ -74,25 +74,38 @@ func FetchMarket(ctx context.Context, rpcCli *rpc.Client, marketAddr solana.Publ
 	dataLen := len(acctInfo.Value.Data)
 	switch dataLen {
 	case 380:
-		if err := meta.MarketV1.Decode(acctInfo.Value.Data); err != nil {
+		marketV1 := &MarketV1{}
+		if err := marketV1.Decode(acctInfo.Value.Data); err != nil {
 			return nil, fmt.Errorf("decoding market v1: %w", err)
 		}
-		return nil, fmt.Errorf("Unsupported market version, w/ data length of 380")
+
+		meta.Market = marketV1
 
 	case 388:
-		if err := meta.MarketV2.Decode(acctInfo.Value.Data); err != nil {
+		marketV2 := &MarketV2{}
+		if err := marketV2.Decode(acctInfo.Value.Data); err != nil {
 			return nil, fmt.Errorf("decoding market v2: %w", err)
 		}
+
+		meta.Market = marketV2
+
+	case 1476:
+		marketV3 := &MarketV3{}
+		if err := marketV3.Decode(acctInfo.Value.Data); err != nil {
+			return nil, fmt.Errorf("decoding market v2: %w", err)
+		}
+
+		meta.Market = marketV3
 
 	default:
 		return nil, fmt.Errorf("unsupported market data length: %d", dataLen)
 	}
 
-	if err := rpcCli.GetAccountDataIn(ctx, meta.MarketV2.QuoteMint, &meta.QuoteMint); err != nil {
+	if err := rpcCli.GetAccountDataIn(ctx, meta.Market.GetQuoteMint(), &meta.QuoteMint); err != nil {
 		return nil, fmt.Errorf("getting quote mint: %w", err)
 	}
 
-	if err := rpcCli.GetAccountDataIn(ctx, meta.MarketV2.BaseMint, &meta.BaseMint); err != nil {
+	if err := rpcCli.GetAccountDataIn(ctx, meta.Market.GetBaseMint(), &meta.BaseMint); err != nil {
 		return nil, fmt.Errorf("getting base token: %w", err)
 	}
 

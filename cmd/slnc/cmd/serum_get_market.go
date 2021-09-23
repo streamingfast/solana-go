@@ -45,12 +45,12 @@ var serumGetMarketCmd = &cobra.Command{
 			return fmt.Errorf("fetch market: %w", err)
 		}
 
-		asks, askSize, err := getOrderBook(ctx, market, cli, market.MarketV2.Asks, false)
+		asks, askSize, err := getOrderBook(ctx, market, cli, market.Market.GetAsks(), false)
 		if err != nil {
 			return fmt.Errorf("unable to retrieve asks: %w", err)
 		}
 
-		bids, bidSize, err := getOrderBook(ctx, market, cli, market.MarketV2.Bids, true)
+		bids, bidSize, err := getOrderBook(ctx, market, cli, market.Market.GetBids(), true)
 		if err != nil {
 			return fmt.Errorf("unable to retrieve bids: %w", err)
 		}
@@ -67,17 +67,17 @@ var serumGetMarketCmd = &cobra.Command{
 
 		fmt.Println(market.Name)
 
-		fmt.Println("Request RequestQueue: ", market.MarketV2.RequestQueue)
-		fmt.Println("Event RequestQueue: ", market.MarketV2.EventQueue)
+		fmt.Println("Request RequestQueue: ", market.Market.GetRequestQueue())
+		fmt.Println("Event RequestQueue: ", market.Market.GetEventQueue())
 
 		fmt.Println("Base")
-		fmt.Println("base mint", market.MarketV2.BaseMint.String())
-		fmt.Println("base lot size", market.MarketV2.BaseLotSize)
+		fmt.Println("base mint", market.Market.GetBaseMint().String())
+		fmt.Println("base lot size", market.Market.GetBaseLotSize())
 
 		fmt.Println("")
 		fmt.Println("Quote")
-		fmt.Println("quote mint", market.MarketV2.QuoteMint.String())
-		fmt.Println("quote lot size", market.MarketV2.QuoteLotSize)
+		fmt.Println("quote mint", market.Market.GetQuoteMint().String())
+		fmt.Println("quote lot size", market.Market.GetQuoteLotSize())
 
 		fmt.Println(columnize.Format(output, nil))
 		return nil
