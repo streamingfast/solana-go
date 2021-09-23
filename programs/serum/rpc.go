@@ -73,11 +73,11 @@ func FetchMarket(ctx context.Context, rpcCli *rpc.Client, marketAddr solana.Publ
 
 	dataLen := len(acctInfo.Value.Data)
 	switch dataLen {
-	// case 380:
-	// 	// if err := meta.MarketV1.Decode(acctInfo.Value.Data); err != nil {
-	// 	// 	return nil, fmt.Errorf("decoding market v1: %w", err)
-	// 	// }
-	// 	return nil, fmt.Errorf("Unsupported market version, w/ data length of 380")
+	case 380:
+		if err := meta.MarketV1.Decode(acctInfo.Value.Data); err != nil {
+			return nil, fmt.Errorf("decoding market v1: %w", err)
+		}
+		return nil, fmt.Errorf("Unsupported market version, w/ data length of 380")
 
 	case 388:
 		if err := meta.MarketV2.Decode(acctInfo.Value.Data); err != nil {

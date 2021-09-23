@@ -16,8 +16,10 @@ package cli
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/pkg/errors"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 func GetDecryptPassphrase() (string, error) {
@@ -44,5 +46,12 @@ func GetEncryptPassphrase() (string, error) {
 		return "", errors.New("passphrase mismatch!")
 	}
 	return passphrase, nil
+}
 
+func GetPassword(input string) (string, error) {
+	fd := os.Stdin.Fd()
+	fmt.Printf(input)
+	pass, err := terminal.ReadPassword(int(fd))
+	fmt.Println("")
+	return string(pass), err
 }
