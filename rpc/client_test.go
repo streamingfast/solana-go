@@ -76,7 +76,7 @@ func TestClient_GetConfirmedTransaction(t *testing.T) {
 		"json",
 	}}, server.RequestBody(t))
 
-	signature, err := solana.SignatureFromBase58("53hoZ98EsCMA6L63GWM65M3Bd3WqA4LxD8bcJkbKoKWhbJFqX9M1WZ4fSjt8bYyZn21NwNnV2A25zirBni9Qk6LR")
+	signature, err := solana.NewSignatureFromBase58("53hoZ98EsCMA6L63GWM65M3Bd3WqA4LxD8bcJkbKoKWhbJFqX9M1WZ4fSjt8bYyZn21NwNnV2A25zirBni9Qk6LR")
 	require.NoError(t, err)
 
 	assert.Equal(t, TransactionWithMeta{

@@ -15,7 +15,9 @@
 package solana
 
 import (
+	"crypto/ed25519"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -28,21 +30,38 @@ type Padding []byte
 
 type Hash PublicKey
 
-///
 type Signature [64]byte
 
+// Deprecated: Use NewSignatureFromBase58 instead
 func SignatureFromBase58(in string) (out Signature, err error) {
-	val, err := base58.Decode(in)
-	if err != nil {
+	return NewSignatureFromBase58(in)
+}
+
+func NewSignatureFromBytes(in []byte) (out Signature, err error) {
+	if len(in) != 64 {
+		err = fmt.Errorf("invalid length, expected 64, got %d", len(in))
 		return
+	}
+	copy(out[:], in)
+	return
+}
+
+func NewSignatureFromString(in string) (out Signature, err error) {
+	bytes, err := hex.DecodeString(in)
+	if err != nil {
+		return out, fmt.Errorf("hex decode: %w", err)
 	}
 
-	if len(val) != 64 {
-		err = fmt.Errorf("invalid length, expected 64, got %d", len(val))
-		return
+	return NewSignatureFromBytes(bytes)
+}
+
+func NewSignatureFromBase58(in string) (out Signature, err error) {
+	bytes, err := base58.Decode(in)
+	if err != nil {
+		return out, fmt.Errorf("base58 decode: %w", err)
 	}
-	copy(out[:], val)
-	return
+
+	return NewSignatureFromBytes(bytes)
 }
 
 func (p Signature) MarshalJSON() ([]byte, error) {
@@ -69,6 +88,10 @@ func (p *Signature) UnmarshalJSON(data []byte) (err error) {
 	copy(target[:], dat)
 	*p = target
 	return
+}
+
+func (s Signature) Verify(publicKey PublicKey, message []byte) bool {
+	return ed25519.Verify(ed25519.PublicKey(publicKey[:]), message, s[:])
 }
 
 func (p Signature) String() string {
