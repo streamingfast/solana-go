@@ -4,12 +4,16 @@ import (
 	"crypto"
 	"crypto/ed25519"
 	crypto_rand "crypto/rand"
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 
+	"filippo.io/edwards25519"
 	"github.com/mr-tron/base58"
 )
+
+const MAX_SEED_LENGTH = 32
 
 type PrivateKey []byte
 
@@ -41,7 +45,7 @@ func PrivateKeyFromSolanaKeygenFile(file string) (PrivateKey, error) {
 		return nil, fmt.Errorf("decode keygen file: %w", err)
 	}
 
-	return PrivateKey([]byte(values)), nil
+	return values, nil
 }
 
 func (k PrivateKey) String() string {
@@ -120,6 +124,39 @@ func PublicKeyFromBase58(in string) (out PublicKey, err error) {
 	return
 }
 
+func PublicKeyFindProgramAddress(path [][]byte, programId PublicKey) (PublicKey, byte, error) {
+	nonce := uint64(255)
+	for {
+		nonceB := byte(0xff & nonce)
+		seedsWithNonce := append(path, []byte{nonceB})
+		key, err := createProgramAddress(seedsWithNonce, programId)
+		if err == nil {
+			return key, nonceB, nil
+		}
+		nonce -= 1
+		if nonce == 0 {
+			return PublicKey{}, 0x00, fmt.Errorf("unable to find a viable program address nonce")
+		}
+	}
+	return PublicKey{}, 0x00, nil
+}
+
+func createProgramAddress(seeds [][]byte, programId PublicKey) (PublicKey, error) {
+	buf := []byte{}
+	for _, seed := range seeds {
+		if len(seed) > MAX_SEED_LENGTH {
+			return PublicKey{}, fmt.Errorf("max seed length exceeded")
+		}
+		buf = append(buf, seed...)
+	}
+	buf = append(buf, programId[:]...)
+	buf = append(buf, []byte("ProgramDerivedAddress")...)
+	pkey := sha256.Sum256(buf)
+	if _, err := new(edwards25519.Point).SetBytes(pkey[:]); err == nil {
+		return PublicKey{}, fmt.Errorf("invalid seeds, address must fall off the curve")
+	}
+	return pkey, nil
+}
 func (p PublicKey) MarshalJSON() ([]byte, error) {
 	return json.Marshal(base58.Encode(p[:]))
 }
