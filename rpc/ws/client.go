@@ -39,7 +39,6 @@ type Client struct {
 	lock                    sync.RWMutex
 	subscriptionByRequestID map[uint64]*Subscription
 	subscriptionByWSSubID   map[uint64]*Subscription
-	reconnectOnErr          bool
 }
 
 func NewClient(wsURL string) *Client {
@@ -124,7 +123,6 @@ func (c *Client) handleNewSubscriptionMessage(requestID, subID uint64) {
 		zap.Uint64("request_id", requestID),
 		zap.Int("subscription_count", len(c.subscriptionByWSSubID)),
 	)
-	return
 }
 
 func (c *Client) handleSubscriptionMessage(subID uint64, message []byte) {
@@ -155,7 +153,7 @@ func (c *Client) handleSubscriptionMessage(subID uint64, message []byte) {
 	// this cannot be blocking or else
 	// we  will no read any other message
 	if len(sub.stream) >= cap(sub.stream) {
-		zlog.Warn("closing ws client subscription... not consuming fast en ought",
+		zlog.Warn("closing ws client subscription... not consuming fast enough",
 			zap.Uint64("request_id", sub.req.ID),
 		)
 		c.closeSubscription(sub.req.ID, fmt.Errorf("reached channel max capacity %d", len(sub.stream)))
@@ -163,7 +161,6 @@ func (c *Client) handleSubscriptionMessage(subID uint64, message []byte) {
 	}
 
 	sub.stream <- result
-	return
 }
 
 func (c *Client) closeAllSubscription(err error) {

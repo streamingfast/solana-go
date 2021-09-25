@@ -125,20 +125,19 @@ func PublicKeyFromBase58(in string) (out PublicKey, err error) {
 }
 
 func PublicKeyFindProgramAddress(path [][]byte, programId PublicKey) (PublicKey, byte, error) {
-	nonce := uint64(255)
+	nonce := byte(255)
 	for {
-		nonceB := byte(0xff & nonce)
-		seedsWithNonce := append(path, []byte{nonceB})
+		seedsWithNonce := append(path, []byte{nonce})
 		key, err := createProgramAddress(seedsWithNonce, programId)
 		if err == nil {
-			return key, nonceB, nil
+			return key, nonce, nil
 		}
+
 		nonce -= 1
 		if nonce == 0 {
 			return PublicKey{}, 0x00, fmt.Errorf("unable to find a viable program address nonce")
 		}
 	}
-	return PublicKey{}, 0x00, nil
 }
 
 func createProgramAddress(seeds [][]byte, programId PublicKey) (PublicKey, error) {

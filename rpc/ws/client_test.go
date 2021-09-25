@@ -40,7 +40,7 @@ func Test_AccountSubscribe(t *testing.T) {
 	sub, err := c.AccountSubscribe(accountID, "")
 	require.NoError(t, err)
 
-	data, err := sub.Recv()
+	data, err := sub.Recv(context.Background())
 	if err != nil {
 		fmt.Println("receive an error: ", err)
 		return
@@ -48,8 +48,6 @@ func Test_AccountSubscribe(t *testing.T) {
 	text.NewEncoder(os.Stdout).Encode(data, nil)
 	fmt.Println("OpenOrders: ", data.(*AccountResult).Value.Account.Owner)
 	fmt.Println("data: ", data.(*AccountResult).Value.Account.Data)
-	return
-
 }
 
 func Test_ProgramSubscribe(t *testing.T) {
@@ -68,7 +66,7 @@ func Test_ProgramSubscribe(t *testing.T) {
 	require.NoError(t, err)
 
 	for {
-		data, err := sub.Recv()
+		data, err := sub.Recv(context.Background())
 		if err != nil {
 			fmt.Println("receive an error: ", err)
 			return
@@ -90,7 +88,7 @@ func Test_SlotSubscribe(t *testing.T) {
 	sub, err := c.SlotSubscribe()
 	require.NoError(t, err)
 
-	data, err := sub.Recv()
+	data, err := sub.Recv(context.Background())
 	if err != nil {
 		fmt.Println("receive an error: ", err)
 		return

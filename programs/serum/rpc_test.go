@@ -66,7 +66,7 @@ func TestStreamOpenOrders(t *testing.T) {
 	err := client.Dial(context.Background())
 	require.NoError(t, err)
 
-	err = StreamOpenOrders(client)
+	err = StreamOpenOrders(context.Background(), client)
 	require.NoError(t, err)
 
 }

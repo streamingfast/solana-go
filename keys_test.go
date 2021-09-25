@@ -91,7 +91,7 @@ func TestPublicKeyFindProgramAddress(t *testing.T) {
 	pubkey, bump, err := PublicKeyFindProgramAddress(path, programId)
 	require.NoError(t, err)
 	assert.Equal(t, MustPublicKeyFromBase58("4MnvpFPTXVXjtzj7jmzcakU9DiCWM5NrU9PTfMmKvQLA"), pubkey)
-	assert.Equal(t, 0xff, uint8(bump))
+	assert.Equal(t, byte(0xff), uint8(bump))
 }
 
 func TestPrivateKeyFromSolanaKeygenFile(t *testing.T) {
