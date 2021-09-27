@@ -25,6 +25,7 @@ import (
 )
 
 var PROGRAM_ID = solana.MustPublicKeyFromBase58("11111111111111111111111111111111")
+var SYSVAR_RENT = solana.MustPublicKeyFromBase58("SysvarRent111111111111111111111111111111111")
 
 func init() {
 	solana.RegisterInstructionDecoder(PROGRAM_ID, registryDecodeInstruction)

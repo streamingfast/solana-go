@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"net/http"
@@ -230,6 +231,7 @@ func (c *Client) SendTransaction(
 	}
 
 	trxData := buf.Bytes()
+	fmt.Println("Encodeded trx: ", hex.EncodeToString(trxData))
 
 	obj := map[string]interface{}{
 		"encoding": "base64",

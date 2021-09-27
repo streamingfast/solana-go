@@ -83,15 +83,15 @@ func TestPublicKeyFromBase58(t *testing.T) {
 }
 
 func TestPublicKeyFindProgramAddress(t *testing.T) {
-	programId := MustPublicKeyFromBase58("4uQeVj5tqViQh7yWWGStvkEG1Zmhx6uasJtWCJziofM")
+	programId := MustPublicKeyFromBase58("MUG944SDz65o8te2Nz2tqv2e3KuN3QR1ZhyphufAybm")
 	path := [][]byte{
-		[]byte("GLOBAL"),
+		[]byte("globalstate"),
 		programId[:],
 	}
 	pubkey, bump, err := PublicKeyFindProgramAddress(path, programId)
 	require.NoError(t, err)
-	assert.Equal(t, MustPublicKeyFromBase58("4MnvpFPTXVXjtzj7jmzcakU9DiCWM5NrU9PTfMmKvQLA"), pubkey)
-	assert.Equal(t, byte(0xff), uint8(bump))
+	assert.Equal(t, MustPublicKeyFromBase58("FNPA5NeQ2M491CAFgSKZ8H21zYuVNzpGqvmu3RUEyYkE"), pubkey)
+	assert.Equal(t, uint8(0xff), uint8(bump))
 }
 
 func TestPrivateKeyFromSolanaKeygenFile(t *testing.T) {
