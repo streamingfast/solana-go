@@ -310,7 +310,6 @@ func (c *Client) callFor(out interface{}, method string, params ...interface{}) 
 	}
 
 	if rpcResponse.Error != nil {
-		fmt.Println("GGGGRRRR:", rpcResponse.Result)
 		return fmt.Errorf("rpc response: %w", rpcResponse.Error)
 	}
 
