@@ -16,6 +16,7 @@ package token
 
 import (
 	"bytes"
+	"encoding/hex"
 	"fmt"
 
 	bin "github.com/streamingfast/binary"
@@ -130,7 +131,7 @@ type InitializeMint struct {
 	/// The authority/multisignature to mint tokens.
 	MintAuthority solana.PublicKey
 	/// The freeze authority/multisignature of the mint.
-	FreezeAuthority *solana.PublicKey
+	FreezeAuthority *solana.PublicKey       `bin:"optional"`
 	Accounts        *InitializeMintAccounts `bin:"-"`
 }
 

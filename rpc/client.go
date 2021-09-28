@@ -308,11 +308,12 @@ func (c *Client) callFor(out interface{}, method string, params ...interface{}) 
 	_ = ctx
 	rpcResponse, err := c.rpcClient.CallRaw(request)
 	if err != nil {
-		return err
+		return fmt.Errorf("call raw: %w", err)
 	}
 
 	if rpcResponse.Error != nil {
-		return rpcResponse.Error
+		fmt.Println("GGGGRRRR:", rpcResponse.Result)
+		return fmt.Errorf("rpc response: %w", rpcResponse.Error)
 	}
 
 	return rpcResponse.GetObject(out)
