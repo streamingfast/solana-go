@@ -75,6 +75,7 @@ func (i *Instruction) Accounts() (out []*solana.AccountMeta) {
 			accounts.Mint,
 			accounts.SystemProgram,
 			accounts.SPLTokenProgram,
+			accounts.RentProgram,
 		}
 	}
 	return
@@ -114,6 +115,7 @@ type CreateAccounts struct {
 	Mint                         *solana.AccountMeta
 	SystemProgram                *solana.AccountMeta
 	SPLTokenProgram              *solana.AccountMeta
+	RentProgram                  *solana.AccountMeta
 }
 type Create struct {
 	Accounts *CreateAccounts `bin:"-"`
@@ -146,8 +148,24 @@ func NewCreateInstruction(
 					Mint:                         &solana.AccountMeta{PublicKey: mint},
 					SystemProgram:                &solana.AccountMeta{PublicKey: system.PROGRAM_ID},
 					SPLTokenProgram:              &solana.AccountMeta{PublicKey: token.TOKEN_PROGRAM_ID},
+					RentProgram:                  &solana.AccountMeta{PublicKey: system.SYSVAR_RENT},
 				},
 			},
 		},
 	}
+}
+
+func MustGetAssociatedTokenAddress(mint solana.PublicKey, programId solana.PublicKey, owner solana.PublicKey) solana.PublicKey {
+	path := [][]byte{
+		owner[:],
+		programId[:],
+		mint[:],
+	}
+
+	pubKey, _, err := solana.PublicKeyFindProgramAddress(path, ASSOCIATED_TOKEN_PROGRAM_ID)
+	if err != nil {
+		panic(fmt.Errorf("unable ot find pda for spl token association: %w", err))
+	}
+	return pubKey
+
 }
