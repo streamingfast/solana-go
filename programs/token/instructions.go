@@ -81,6 +81,10 @@ func (i *Instruction) Accounts() (out []*solana.AccountMeta) {
 	case 0:
 		accounts := i.Impl.(*InitializeMint).Accounts
 		out = []*solana.AccountMeta{accounts.Mint, accounts.RentProgram}
+	case 6:
+		accounts := i.Impl.(*SetAuthority).Accounts
+		out = []*solana.AccountMeta{accounts.Mint, accounts.Signer}
+
 	}
 	return
 }
@@ -149,8 +153,8 @@ func NewInitializeMintInstruction(
 				MintAuthority:   mintAuthority,
 				FreezeAuthority: freezeAuthority,
 				Accounts: &InitializeMintAccounts{
-					Mint:        &solana.AccountMeta{PublicKey: mint, IsSigner: false, IsWritable: true},
-					RentProgram: &solana.AccountMeta{PublicKey: rentProgram, IsSigner: false, IsWritable: false},
+					Mint:        &solana.AccountMeta{PublicKey: mint, IsWritable: true},
+					RentProgram: &solana.AccountMeta{PublicKey: rentProgram},
 				},
 			},
 		},
@@ -185,9 +189,52 @@ type Revoke struct {
 }
 
 type SetAuthorityAccounts struct {
+	Mint   *solana.AccountMeta
+	Signer *solana.AccountMeta
 }
+type AuthorityType byte
+
+const (
+	MintTokensAuthorityType AuthorityType = iota
+	FreezeAccountAuthorityType
+	AccountOwnerAuthorityType
+	CloseAccountAuthorityType
+)
+
+// Sets a new authority of a mint or account.
+//
+// Accounts expected by this instruction:
+//
+//   * Single authority
+//   0. `[writable]` The mint or account to change the authority of.
+//   1. `[signer]` The current authority of the mint or account.
+//
+
 type SetAuthority struct {
-	Accounts *SetAuthorityAccounts
+	AuthorityType   AuthorityType
+	MewAuthorityKey solana.PublicKey
+	Accounts        *SetAuthorityAccounts `bin:"-"`
+}
+
+func NewSetAuthorityInstruction(
+	authorityType AuthorityType,
+	newAuthorityKey solana.PublicKey,
+	mint solana.PublicKey,
+	signer solana.PublicKey,
+) *Instruction {
+	return &Instruction{
+		BaseVariant: bin.BaseVariant{
+			TypeID: 6,
+			Impl: &SetAuthority{
+				AuthorityType:   authorityType,
+				MewAuthorityKey: newAuthorityKey,
+				Accounts: &SetAuthorityAccounts{
+					Mint:   &solana.AccountMeta{PublicKey: mint, IsWritable: true},
+					Signer: &solana.AccountMeta{PublicKey: signer, IsSigner: true},
+				},
+			},
+		},
+	}
 }
 
 type MintToAccounts struct {
