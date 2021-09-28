@@ -16,7 +16,6 @@ package token
 
 import (
 	"bytes"
-	"encoding/hex"
 	"fmt"
 
 	bin "github.com/streamingfast/binary"
