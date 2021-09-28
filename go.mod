@@ -11,14 +11,12 @@ require (
 	github.com/gorilla/rpc v1.2.0
 	github.com/gorilla/websocket v1.4.2
 	github.com/klauspost/compress v1.11.3
-	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/magiconair/properties v1.8.5
 	github.com/mr-tron/base58 v1.2.0
-	github.com/near/borsh-go v0.3.1-0.20210831082424-4377deff6791 // indirect
+	github.com/near/borsh-go v0.3.1-0.20210831082424-4377deff6791
 	github.com/onsi/gomega v1.10.1 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/ryanuber/columnize v0.0.0-20160712163229-9b3edd62028f
-	github.com/spf13/afero v1.6.0 // indirect
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.9.0
@@ -29,7 +27,6 @@ require (
 	github.com/tidwall/gjson v1.6.7
 	github.com/ybbus/jsonrpc v2.1.2+incompatible
 	go.uber.org/atomic v1.7.0
-	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.17.0
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f

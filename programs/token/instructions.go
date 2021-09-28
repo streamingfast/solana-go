@@ -15,12 +15,12 @@
 package token
 
 import (
+	"bytes"
 	"fmt"
-
-	"github.com/streamingfast/solana-go/text"
 
 	bin "github.com/streamingfast/binary"
 	"github.com/streamingfast/solana-go"
+	"github.com/streamingfast/solana-go/text"
 )
 
 var TOKEN_PROGRAM_ID = solana.MustPublicKeyFromBase58("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
@@ -76,6 +76,27 @@ type Instruction struct {
 	bin.BaseVariant
 }
 
+func (i *Instruction) Accounts() (out []*solana.AccountMeta) {
+	switch i.TypeID {
+	case 0:
+		accounts := i.Impl.(*InitializeMint).Accounts
+		out = []*solana.AccountMeta{accounts.Mint, accounts.RentProgram}
+	}
+	return
+}
+
+func (i *Instruction) ProgramID() solana.PublicKey {
+	return TOKEN_PROGRAM_ID
+}
+
+func (i *Instruction) Data() ([]byte, error) {
+	buf := new(bytes.Buffer)
+	if err := bin.NewEncoder(buf).Encode(i); err != nil {
+		return nil, fmt.Errorf("unable to encode instruction: %w", err)
+	}
+	return buf.Bytes(), nil
+}
+
 func (i *Instruction) UnmarshalBinary(decoder *bin.Decoder) (err error) {
 	return i.BaseVariant.UnmarshalBinaryVariant(decoder, InstructionDefVariant)
 }
@@ -98,13 +119,55 @@ type InitializeMultisig struct {
 }
 
 type InitializeMintAccounts struct {
+	Mint        *solana.AccountMeta
+	RentProgram *solana.AccountMeta
+	///   0. `[writable]` The mint to initialize.
+	///   1. `[]` Rent sysvar
 }
 type InitializeMint struct {
-	Accounts *InitializeMintAccounts
+	/// Number of base 10 digits to the right of the decimal place.
+	Decimals uint8
+	/// The authority/multisignature to mint tokens.
+	MintAuthority solana.PublicKey
+	/// The freeze authority/multisignature of the mint.
+	FreezeAuthority *solana.PublicKey
+	Accounts        *InitializeMintAccounts `bin:"-"`
+}
+
+func NewInitializeMintInstruction(
+	decimals uint8,
+	mint solana.PublicKey,
+	mintAuthority solana.PublicKey,
+	freezeAuthority *solana.PublicKey,
+	rentProgram solana.PublicKey,
+) *Instruction {
+	return &Instruction{
+		BaseVariant: bin.BaseVariant{
+			TypeID: 0,
+			Impl: &InitializeMint{
+				Decimals:        decimals,
+				MintAuthority:   mintAuthority,
+				FreezeAuthority: freezeAuthority,
+				Accounts: &InitializeMintAccounts{
+					Mint:        &solana.AccountMeta{PublicKey: mint, IsSigner: false, IsWritable: true},
+					RentProgram: &solana.AccountMeta{PublicKey: rentProgram, IsSigner: false, IsWritable: false},
+				},
+			},
+		},
+	}
+}
+
+func (i *InitializeMint) SetAccounts(accounts []*solana.AccountMeta) error {
+	i.Accounts = &InitializeMintAccounts{
+		Mint:        accounts[0],
+		RentProgram: accounts[1],
+	}
+	return nil
 }
 
 type TransferAccounts struct {
 }
+
 type Transfer struct {
 	Accounts *TransferAccounts
 }
