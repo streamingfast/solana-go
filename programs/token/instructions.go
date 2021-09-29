@@ -92,7 +92,7 @@ func (i *Instruction) Accounts() (out []*solana.AccountMeta) {
 }
 
 func (i *Instruction) ProgramID() solana.PublicKey {
-	return TOKEN_PROGRAM_ID
+	return PROGRAM_ID
 }
 
 func (i *Instruction) Data() ([]byte, error) {

@@ -33,7 +33,7 @@ var tokenListMintsCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("unable to retrieve mints: %w", err)
 		}
-		out := []string{"Mint | Decimals | Supply | Token Authority | Freeze Authority"}
+		out := []string{"Account | Decimals | Supply | Token Authority | Freeze Authority"}
 		for _, m := range mints {
 			line := []string{
 				fmt.Sprintf("%d", m.MintAuthorityOption),
