@@ -23,10 +23,10 @@ import (
 	"github.com/streamingfast/solana-go/text"
 )
 
-var TOKEN_PROGRAM_ID = solana.MustPublicKeyFromBase58("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
+var PROGRAM_ID = solana.MustPublicKeyFromBase58("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
 
 func init() {
-	solana.RegisterInstructionDecoder(TOKEN_PROGRAM_ID, registryDecodeInstruction)
+	solana.RegisterInstructionDecoder(PROGRAM_ID, registryDecodeInstruction)
 }
 
 func registryDecodeInstruction(accounts []*solana.AccountMeta, data []byte) (interface{}, error) {
