@@ -30,6 +30,15 @@ type Account struct {
 	DelegatedAmount bin.Uint64
 }
 
+func (a *Account) Decode(in []byte) error {
+	decoder := bin.NewDecoder(in)
+	err := decoder.Decode(&a)
+	if err != nil {
+		return fmt.Errorf("unpack: %w", err)
+	}
+	return nil
+}
+
 type Multisig struct {
 	M             byte
 	N             byte

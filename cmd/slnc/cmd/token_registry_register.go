@@ -131,7 +131,7 @@ var tokenRegistryRegisterCmd = &cobra.Command{
 		}
 
 		fmt.Printf("Token Register successfully, with transaction hash: %s\n", trxHash)
-		fmt.Printf("  Mint Address Registerd: %s\n", tokenAddress.String())
+		fmt.Printf("  Account Address Registerd: %s\n", tokenAddress.String())
 		fmt.Printf("  Token Registry Meta Address: %s\n", tokenMetaAccount.PublicKey().String())
 		return nil
 	},

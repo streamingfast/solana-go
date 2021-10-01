@@ -23,10 +23,10 @@ import (
 	"github.com/streamingfast/solana-go/text"
 )
 
-var TOKEN_PROGRAM_ID = solana.MustPublicKeyFromBase58("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
+var PROGRAM_ID = solana.MustPublicKeyFromBase58("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
 
 func init() {
-	solana.RegisterInstructionDecoder(TOKEN_PROGRAM_ID, registryDecodeInstruction)
+	solana.RegisterInstructionDecoder(PROGRAM_ID, registryDecodeInstruction)
 }
 
 func registryDecodeInstruction(accounts []*solana.AccountMeta, data []byte) (interface{}, error) {
@@ -83,14 +83,16 @@ func (i *Instruction) Accounts() (out []*solana.AccountMeta) {
 		out = []*solana.AccountMeta{accounts.Mint, accounts.RentProgram}
 	case 6:
 		accounts := i.Impl.(*SetAuthority).Accounts
-		out = []*solana.AccountMeta{accounts.Mint, accounts.Signer}
-
+		out = []*solana.AccountMeta{
+			accounts.Account,
+			accounts.CurrentAuthority,
+		}
 	}
 	return
 }
 
 func (i *Instruction) ProgramID() solana.PublicKey {
-	return TOKEN_PROGRAM_ID
+	return PROGRAM_ID
 }
 
 func (i *Instruction) Data() ([]byte, error) {
@@ -189,8 +191,8 @@ type Revoke struct {
 }
 
 type SetAuthorityAccounts struct {
-	Mint   *solana.AccountMeta
-	Signer *solana.AccountMeta
+	Account          *solana.AccountMeta
+	CurrentAuthority *solana.AccountMeta
 }
 type AuthorityType byte
 
@@ -212,25 +214,25 @@ const (
 
 type SetAuthority struct {
 	AuthorityType   AuthorityType
-	MewAuthorityKey solana.PublicKey
+	NewAuthorityKey solana.PublicKey      `bin:"optional"`
 	Accounts        *SetAuthorityAccounts `bin:"-"`
 }
 
 func NewSetAuthorityInstruction(
+	account solana.PublicKey, // either a spl_token::mint or spl_token::account
+	newAuthority solana.PublicKey,
 	authorityType AuthorityType,
-	newAuthorityKey solana.PublicKey,
-	mint solana.PublicKey,
-	signer solana.PublicKey,
+	currentAuthority solana.PublicKey,
 ) *Instruction {
 	return &Instruction{
 		BaseVariant: bin.BaseVariant{
 			TypeID: 6,
 			Impl: &SetAuthority{
 				AuthorityType:   authorityType,
-				MewAuthorityKey: newAuthorityKey,
+				NewAuthorityKey: newAuthority,
 				Accounts: &SetAuthorityAccounts{
-					Mint:   &solana.AccountMeta{PublicKey: mint, IsWritable: true},
-					Signer: &solana.AccountMeta{PublicKey: signer, IsSigner: true},
+					Account:          &solana.AccountMeta{PublicKey: account, IsWritable: true},
+					CurrentAuthority: &solana.AccountMeta{PublicKey: currentAuthority, IsSigner: true},
 				},
 			},
 		},

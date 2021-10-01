@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"net/http"
@@ -225,10 +224,6 @@ func (c *Client) SendTransaction(
 	opts *SendTransactionOptions,
 ) (signature string, err error) {
 	buf := new(bytes.Buffer)
-	fmt.Println("TRANSACTION", transaction)
-	for _, ci := range transaction.Message.Instructions {
-		fmt.Println("Instruction:", ci.ProgramIDIndex, hex.EncodeToString(ci.Data))
-	}
 
 	if err := bin.NewEncoder(buf).Encode(transaction); err != nil {
 		return "", fmt.Errorf("send transaction: encode transaction: %w", err)

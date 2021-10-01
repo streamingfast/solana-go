@@ -26,7 +26,7 @@ import (
 func FetchMints(ctx context.Context, rpcCli *rpc.Client) (out []*Mint, err error) {
 	resp, err := rpcCli.GetProgramAccounts(
 		ctx,
-		TOKEN_PROGRAM_ID,
+		PROGRAM_ID,
 		&rpc.GetProgramAccountsOpts{
 			Filters: []rpc.RPCFilter{
 				{

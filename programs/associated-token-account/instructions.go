@@ -25,10 +25,10 @@ import (
 	"github.com/streamingfast/solana-go/text"
 )
 
-var ASSOCIATED_TOKEN_PROGRAM_ID = solana.MustPublicKeyFromBase58("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL")
+var PROGRAM_ID = solana.MustPublicKeyFromBase58("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL")
 
 func init() {
-	solana.RegisterInstructionDecoder(ASSOCIATED_TOKEN_PROGRAM_ID, registryDecodeInstruction)
+	solana.RegisterInstructionDecoder(PROGRAM_ID, registryDecodeInstruction)
 }
 
 func registryDecodeInstruction(accounts []*solana.AccountMeta, data []byte) (interface{}, error) {
@@ -44,7 +44,6 @@ func DecodeInstruction(accounts []*solana.AccountMeta, data []byte) (*Instructio
 	if err := bin.NewDecoder(data).Decode(&inst); err != nil {
 		return nil, fmt.Errorf("unable to decode instruction for serum program: %w", err)
 	}
-
 	if v, ok := inst.Impl.(solana.AccountSettable); ok {
 		err := v.SetAccounts(accounts)
 		if err != nil {
@@ -74,6 +73,7 @@ func (i *Instruction) Accounts() (out []*solana.AccountMeta) {
 			accounts.Mint,
 			accounts.SystemProgram,
 			accounts.SPLTokenProgram,
+			accounts.RentProgram,
 		}
 		for _, ac := range out {
 			fmt.Println("Created account:", ac.PublicKey.String())
@@ -83,7 +83,7 @@ func (i *Instruction) Accounts() (out []*solana.AccountMeta) {
 }
 
 func (i *Instruction) ProgramID() solana.PublicKey {
-	return ASSOCIATED_TOKEN_PROGRAM_ID
+	return PROGRAM_ID
 }
 
 func (i *Instruction) Data() ([]byte, error) {
@@ -116,26 +116,17 @@ type CreateAccounts struct {
 	Mint                         *solana.AccountMeta
 	SystemProgram                *solana.AccountMeta
 	SPLTokenProgram              *solana.AccountMeta
+	RentProgram                  *solana.AccountMeta
 }
 type Create struct {
 	Accounts *CreateAccounts `bin:"-"`
 }
-
-// Creates an associated token account for the given wallet address and token mint
-//
-//   0. `[writeable,signer]` Funding account (must be a system account)
-//   1. `[writeable]` Associated token account address to be created
-//   2. `[]` Wallet address for the new associated token account
-//   3. `[]` The token mint for the new associated token account
-//   4. `[]` System program
-//   5. `[]` SPL Token program
 
 func NewCreateInstruction(
 	fundingAccount solana.PublicKey,
 	associatedTokenAccount solana.PublicKey,
 	associatedTokenAccountWallet solana.PublicKey,
 	mint solana.PublicKey,
-
 ) *Instruction {
 	return &Instruction{
 		BaseVariant: bin.BaseVariant{
@@ -147,9 +138,25 @@ func NewCreateInstruction(
 					AssociatedTokenAccountWallet: &solana.AccountMeta{PublicKey: associatedTokenAccountWallet},
 					Mint:                         &solana.AccountMeta{PublicKey: mint},
 					SystemProgram:                &solana.AccountMeta{PublicKey: system.PROGRAM_ID},
-					SPLTokenProgram:              &solana.AccountMeta{PublicKey: token.TOKEN_PROGRAM_ID},
+					SPLTokenProgram:              &solana.AccountMeta{PublicKey: token.PROGRAM_ID},
+					RentProgram:                  &solana.AccountMeta{PublicKey: system.SYSVAR_RENT},
 				},
 			},
 		},
 	}
+}
+
+func MustGetAssociatedTokenAddress(mint solana.PublicKey, programId solana.PublicKey, owner solana.PublicKey) solana.PublicKey {
+	path := [][]byte{
+		owner[:],
+		programId[:],
+		mint[:],
+	}
+
+	pubKey, _, err := solana.PublicKeyFindProgramAddress(path, PROGRAM_ID)
+	if err != nil {
+		panic(fmt.Errorf("unable ot find pda for spl token association: %w", err))
+	}
+	return pubKey
+
 }
