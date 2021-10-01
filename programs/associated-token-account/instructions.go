@@ -18,11 +18,10 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/streamingfast/solana-go/programs/system"
-	"github.com/streamingfast/solana-go/programs/token"
-
 	bin "github.com/streamingfast/binary"
 	"github.com/streamingfast/solana-go"
+	"github.com/streamingfast/solana-go/programs/system"
+	"github.com/streamingfast/solana-go/programs/token"
 	"github.com/streamingfast/solana-go/text"
 )
 
@@ -75,6 +74,9 @@ func (i *Instruction) Accounts() (out []*solana.AccountMeta) {
 			accounts.Mint,
 			accounts.SystemProgram,
 			accounts.SPLTokenProgram,
+		}
+		for _, ac := range out {
+			fmt.Println("Created account:", ac.PublicKey.String())
 		}
 	}
 	return
