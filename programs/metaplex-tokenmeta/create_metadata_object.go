@@ -8,6 +8,7 @@ import (
 type CreateMeta struct {
 	Instruction InstType
 	Data        Data
+	IsMutable   bool
 
 	Accounts *CreateMetaAccounts `borsh_skip:"true"`
 }
@@ -43,10 +44,11 @@ type CreateMetaAccounts struct {
 //   5. `[]` System program
 //   6. `[]` Rent info
 
-func NewCreateMetaInstruction(programID solana.PublicKey, data Data, metadata, mint, mintAuthority, payer, updateAuthority solana.PublicKey) *Instruction {
+func NewCreateMetaInstruction(programID solana.PublicKey, data Data, isMutable bool, metadata, mint, mintAuthority, payer, updateAuthority solana.PublicKey) *Instruction {
 	var inst = CreateMeta{
 		Instruction: CreateMetadataObjectIns,
 		Data:        data,
+		IsMutable:   isMutable,
 		Accounts: &CreateMetaAccounts{
 			Metadata:        &solana.AccountMeta{PublicKey: metadata, IsWritable: true},
 			Mint:            &solana.AccountMeta{PublicKey: mint},
