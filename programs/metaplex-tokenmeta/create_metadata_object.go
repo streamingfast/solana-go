@@ -43,7 +43,7 @@ type CreateMetaAccounts struct {
 //   5. `[]` System program
 //   6. `[]` Rent info
 
-func CreateMetaInstruction(programID solana.PublicKey, data Data, metadata, mint, mintAuthority, payer, updateAuthority solana.PublicKey) *Instruction {
+func NewCreateMetaInstruction(programID solana.PublicKey, data Data, metadata, mint, mintAuthority, payer, updateAuthority solana.PublicKey) *Instruction {
 	var inst = CreateMeta{
 		Instruction: CreateMetadataObjectIns,
 		Data:        data,
