@@ -1,4 +1,4 @@
-package metaplex_tokenmeta
+package metaplex
 
 import (
 	"fmt"
@@ -20,7 +20,7 @@ type Data struct {
 	Symbol               string
 	URI                  string
 	SellerFeeBasisPoints uint16
-	Creator              *[]Creator `bin:"optional"`
+	Creators             *[]Creator `bin:"optional"`
 }
 type Creator struct {
 	Address  solana.PublicKey

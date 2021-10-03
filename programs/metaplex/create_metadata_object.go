@@ -1,4 +1,4 @@
-package metaplex_tokenmeta
+package metaplex
 
 import (
 	"github.com/streamingfast/solana-go"

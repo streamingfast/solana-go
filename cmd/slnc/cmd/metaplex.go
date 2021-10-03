@@ -12,16 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package metaplex_tokenmeta
+package cmd
 
-import (
-	"github.com/streamingfast/logging"
-	"go.uber.org/zap"
-)
+import "github.com/spf13/cobra"
 
-var zlog = zap.NewNop()
-var traceEnabled = logging.IsTraceEnabled("solana-go", "github.com/streamingfast/solana-go/program/metaplex-tokenmeta")
+var metaplexCmd = &cobra.Command{
+	Use:          "metaplex Cmd",
+	Short:        "metaplex commands",
+	SilenceUsage: false,
+}
 
 func init() {
-	logging.Register("github.com/streamingfast/solana-go/program/metaplex-tokenmeta", &zlog)
+	metaplexCmd.PersistentFlags().String("meta-program-id", "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s", "Metaplex program id")
+	RootCmd.AddCommand(metaplexCmd)
 }

@@ -1,4 +1,4 @@
-package metaplex_tokenmeta
+package metaplex
 
 import (
 	"encoding/hex"
@@ -9,6 +9,8 @@ import (
 	"github.com/near/borsh-go"
 	"github.com/streamingfast/solana-go"
 )
+
+var PROGRAM_ID = solana.MustPublicKeyFromBase58("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s")
 
 type InstType uint8
 
@@ -50,4 +52,19 @@ func (i *Instruction) Accounts() (out []*solana.AccountMeta) {
 
 func (i *Instruction) ProgramID() solana.PublicKey {
 	return i.programId
+}
+
+func DeriveMetadataPublicKey(programID, mint solana.PublicKey) (solana.PublicKey, error) {
+	path := [][]byte{
+		[]byte("metadata"),
+		programID[:],
+		mint[:],
+	}
+
+	key, _, err := solana.PublicKeyFindProgramAddress(path, programID)
+	if err != nil {
+		return solana.PublicKey{}, fmt.Errorf("unable to derive metaplex metadata address: %w", err)
+	}
+	return key, nil
+
 }
