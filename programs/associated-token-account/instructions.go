@@ -75,9 +75,6 @@ func (i *Instruction) Accounts() (out []*solana.AccountMeta) {
 			accounts.SPLTokenProgram,
 			accounts.RentProgram,
 		}
-		for _, ac := range out {
-			fmt.Println("Created account:", ac.PublicKey.String())
-		}
 	}
 	return
 }
