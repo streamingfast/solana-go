@@ -49,32 +49,7 @@ var metaplexGetMintCmd = &cobra.Command{
 
 		fmt.Println("Derive metadata account addr: ", metadataAddr.String())
 
-		cli := getClient()
-		acc, err := cli.GetAccountInfo(ctx, metadataAddr)
-		if err != nil {
-			return fmt.Errorf("unable to retrieve account: %w", err)
-		}
-		metadata := &metaplex.Metadata{}
-		err = metadata.Decode(acc.Value.Data)
-		if err != nil {
-			return fmt.Errorf("unable to decode metadata: %w", err)
-		}
-		fmt.Println()
-		fmt.Println("Metadata: ", metadataAddr.String())
-		fmt.Println("Name", metadata.Data.Name)
-		fmt.Println("Symbol", metadata.Data.Symbol)
-		fmt.Println("URI", metadata.Data.URI)
-		fmt.Println("URI", metadata.Data.SellerFeeBasisPoints)
-		if metadata.Data.Creators != nil {
-			fmt.Printf("%d creators\n", len(*metadata.Data.Creators))
-			for _, creator := range *metadata.Data.Creators {
-				fmt.Printf("> %s %d %s\n", creator.Address.String(), creator.Share, creator.Verified)
-			}
-		} else {
-			fmt.Println("No creators")
-		}
-
-		return nil
+		return getAndDisplayMetadata(ctx, metadataAddr)
 	},
 }
 

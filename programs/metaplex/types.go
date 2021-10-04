@@ -7,12 +7,26 @@ import (
 	"github.com/streamingfast/solana-go"
 )
 
+type Key borsh.Enum
+
+const (
+	Uninitialized = iota
+	EditionV1
+	MasterEditionV1
+	ReservationListV1
+	MetadataV1
+	ReservationListV2
+	MasterEditionV2
+	EditionMarker
+)
+
 type Metadata struct {
-	Key [1]byte
-	P   [32]byte
-	P2  [32]byte
-	//Grr [64]byte
-	Data Data
+	Key                 Key
+	UpdateAuthority     solana.PublicKey
+	Mint                solana.PublicKey
+	Data                Data
+	PrimarySaleHappened bool
+	IsMutable           bool
 }
 
 type Data struct {
