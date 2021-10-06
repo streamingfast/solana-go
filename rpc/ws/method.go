@@ -20,3 +20,7 @@ func (c *Client) AccountSubscribe(account solana.PublicKey, commitment rpc.Commi
 func (c *Client) SlotSubscribe() (*Subscription, error) {
 	return c.subscribe(nil, nil, "slotSubscribe", "slotUnsubscribe", "", SlotResult{})
 }
+
+func (c *Client) SignatureSubscribe(signature string, commitment rpc.CommitmentType) (*Subscription, error) {
+	return c.subscribe([]interface{}{signature}, base64Conf, "signatureSubscribe", "signatureUnsubscribe", commitment, SignatureResult{})
+}

@@ -36,6 +36,8 @@ import (
 
 var ErrNotFound = errors.New("not found")
 
+type ClientOption = func(cli *Client) *Client
+
 type Client struct {
 	rpcURL             string
 	rpcClient          jsonrpc.RPCClient
@@ -43,8 +45,8 @@ type Client struct {
 	requestIDGenerator func() int
 }
 
-func NewClient(rpcURL string) *Client {
-	return &Client{
+func NewClient(rpcURL string, opts ...ClientOption) *Client {
+	c := &Client{
 		rpcURL: rpcURL,
 		rpcClient: jsonrpc.NewClientWithOpts(rpcURL, &jsonrpc.RPCClientOpts{
 			HTTPClient: &http.Client{
@@ -55,6 +57,12 @@ func NewClient(rpcURL string) *Client {
 		}),
 		requestIDGenerator: generateRequestID,
 	}
+
+	for _, opt := range opts {
+		c = opt(c)
+	}
+
+	return c
 }
 
 func (c *Client) SetHeader(k, v string) {
@@ -219,7 +227,6 @@ func (c *Client) SimulateTransaction(ctx context.Context, transaction *solana.Tr
 }
 
 func (c *Client) SendTransaction(
-	ctx context.Context,
 	transaction *solana.Transaction,
 	opts *SendTransactionOptions,
 ) (signature string, err error) {

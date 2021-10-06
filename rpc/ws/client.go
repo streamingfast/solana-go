@@ -201,17 +201,20 @@ func (c *Client) unsubscribe(subID uint64, method string) error {
 	req := newRequest([]interface{}{subID}, method, map[string]interface{}{})
 	data, err := req.encode()
 	if err != nil {
-		return fmt.Errorf("unable to encode unsubscription message for subID %d and method %s", subID, method)
+		return fmt.Errorf("unable to encode unsubscription message for subID %d and method %s: %w", subID, method, err)
 	}
 
 	err = c.conn.WriteMessage(websocket.TextMessage, data)
 	if err != nil {
-		return fmt.Errorf("unable to send unsubscription message for subID %d and method %s", subID, method)
+		return fmt.Errorf("unable to send unsubscription message for subID %d and method %s: %w", subID, method, err)
 	}
 	return nil
 }
 
 func (c *Client) subscribe(params []interface{}, conf map[string]interface{}, subscriptionMethod, unsubscribeMethod string, commitment rpc.CommitmentType, resultType interface{}) (*Subscription, error) {
+	if c.conn == nil {
+		return nil, fmt.Errorf("unable to subscribe without performing Dial(ctx context.Context) first")
+	}
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	if commitment != "" {

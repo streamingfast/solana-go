@@ -72,3 +72,12 @@ type SlotResult struct {
 	Root   uint64
 	Slot   uint64
 }
+
+type SignatureResult struct {
+	Context struct {
+		Slot uint64
+	} `json:"context"`
+	Value struct {
+		Err interface{} `json:"err"`
+	} `json:"value"`
+}

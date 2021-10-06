@@ -134,12 +134,6 @@ func NewTransaction(instructions []Instruction, blockHash PublicKey, opts ...Tra
 	}
 	accountKeyIndex := map[string]uint8{}
 	for idx, acc := range finalAccounts {
-
-		zlog.Debug("transaction account",
-			zap.Int("account_index", idx),
-			zap.Stringer("account_pub_key", acc.PublicKey),
-		)
-
 		message.AccountKeys = append(message.AccountKeys, acc.PublicKey)
 		accountKeyIndex[acc.PublicKey.String()] = uint8(idx)
 		if acc.IsSigner {
