@@ -78,7 +78,6 @@ func (c *Client) receiveMessages() {
 			c.closeAllSubscription(err)
 			return
 		}
-		fmt.Println("message: ", string(message))
 		c.handleMessage(message)
 	}
 }
@@ -232,7 +231,9 @@ func (c *Client) subscribe(params []interface{}, conf map[string]interface{}, su
 	}, unsubscribeMethod)
 
 	c.subscriptionByRequestID[req.ID] = sub
-	zlog.Info("added new subscription to websocket client", zap.Int("count", len(c.subscriptionByRequestID)))
+	zlog.Info("added new subscription to websocket client",
+		zap.Int("count", len(c.subscriptionByRequestID)),
+	)
 
 	zlog.Debug("writing data to conn", zap.String("data", string(data)))
 	err = c.conn.WriteMessage(websocket.TextMessage, data)

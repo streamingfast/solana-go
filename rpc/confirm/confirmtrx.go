@@ -28,7 +28,8 @@ func SendAndConfirmTransaction(ctx context.Context, rppClient *rpc.Client, wsCli
 		rpc.CommitmentFinalized,
 	)
 	if err != nil {
-		return sig, fmt.Errorf("failed to subscribe to signature: %w", err)
+		zlog.Info("unable to subscribe to websocket to get transaction confirmation. Skipping")
+		return sig, nil
 	}
 	defer sub.Unsubscribe()
 	for {
