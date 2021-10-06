@@ -10,7 +10,6 @@ import (
 )
 
 func SendAndConfirmTransaction(ctx context.Context, rppClient *rpc.Client, wsClient *ws.Client, transaction *solana.Transaction) (signature string, err error) {
-	fmt.Println("sending transaction")
 	sig, err := rppClient.SendTransaction(
 		transaction,
 		&rpc.SendTransactionOptions{
