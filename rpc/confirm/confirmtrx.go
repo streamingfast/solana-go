@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"go.uber.org/zap"
+
 	"github.com/streamingfast/solana-go"
 	"github.com/streamingfast/solana-go/rpc"
 	"github.com/streamingfast/solana-go/rpc/ws"
@@ -20,6 +22,7 @@ func SendAndConfirmTransaction(ctx context.Context, rppClient *rpc.Client, wsCli
 		return "", fmt.Errorf("unable to send transction: %w", err)
 	}
 
+	zlog.Debug("subscribing to signature", zap.String("sig", sig))
 	sub, err := wsClient.SignatureSubscribe(
 		sig,
 		rpc.CommitmentFinalized,

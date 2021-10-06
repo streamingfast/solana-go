@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -38,11 +39,19 @@ var ErrNotFound = errors.New("not found")
 
 type ClientOption = func(cli *Client) *Client
 
+var WithDebug = func() ClientOption {
+	return func(cli *Client) *Client {
+		cli.debug = true
+		return cli
+	}
+}
+
 type Client struct {
 	rpcURL             string
 	rpcClient          jsonrpc.RPCClient
 	headers            http.Header
 	requestIDGenerator func() int
+	debug              bool
 }
 
 func NewClient(rpcURL string, opts ...ClientOption) *Client {
@@ -256,6 +265,18 @@ func (c *Client) SendTransaction(
 	}
 
 	if err := c.callFor(&signature, "sendTransaction", params...); err != nil {
+		var rpcError *jsonrpc.RPCError
+		if errors.As(err, &rpcError) {
+			instructionError := fromRPCError(rpcError)
+			if c.debug {
+				fmt.Println("RPC ERROR")
+				fmt.Printf("Instruction Index %d error: %s -> %s\n", instructionError.InstructionIndex, instructionError.InstructionErrorType, instructionError.InstructionErrorCode)
+				for _, log := range instructionError.Logs {
+					fmt.Println("> ", log)
+				}
+				zlog.Info("encountered RPC error", zap.Reflect("instruction_error", instructionError))
+			}
+		}
 		return "", fmt.Errorf("send transaction: rpc send: %w", err)
 	}
 	return
@@ -306,10 +327,6 @@ func (c *Client) callFor(out interface{}, method string, params ...interface{}) 
 		logger.Info("performed JSON-RPC call", fields...)
 	}()
 
-	// When `jsonrpc` library we use accepts `ctx contxt.Context` as first parameter in `CallCtxRaw` (or other name),
-	// replace with appropriate function that accept context value.
-	//
-	// See https://github.com/ybbus/jsonrpc/pull/39
 	_ = ctx
 	rpcResponse, err := c.rpcClient.CallRaw(request)
 	if err != nil {
@@ -376,4 +393,41 @@ func (t *withLoggingRoundTripper) RoundTrip(request *http.Request) (*http.Respon
 	}
 
 	return response, nil
+}
+
+type TransactionError struct {
+	rpcError             *jsonrpc.RPCError
+	InstructionIndex     uint64
+	Logs                 []string
+	InstructionErrorCode json.Number
+	InstructionErrorType string
+}
+
+func fromRPCError(rpcError *jsonrpc.RPCError) *TransactionError {
+	transactionErr := &TransactionError{rpcError: rpcError}
+	v, ok := rpcError.Data.(map[string]interface{})
+	if !ok {
+		return transactionErr
+	}
+	if err, ok := v["err"].(map[string]interface{}); ok {
+		if instructionError, ok := err["InstructionError"].([]interface{}); ok {
+			if len(instructionError) == 2 {
+				if idx, ok := instructionError[0].(uint64); ok {
+					transactionErr.InstructionIndex = idx
+				}
+				if instErr, ok := instructionError[1].(map[string]interface{}); ok {
+					for instErrType, instErrCode := range instErr {
+						transactionErr.InstructionErrorType = instErrType
+						transactionErr.InstructionErrorCode = instErrCode.(json.Number)
+					}
+				}
+			}
+		}
+	}
+	if logs, ok := v["logs"].([]interface{}); ok {
+		for _, log := range logs {
+			transactionErr.Logs = append(transactionErr.Logs, log.(string))
+		}
+	}
+	return transactionErr
 }

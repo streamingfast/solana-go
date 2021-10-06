@@ -78,6 +78,7 @@ func (c *Client) receiveMessages() {
 			c.closeAllSubscription(err)
 			return
 		}
+		fmt.Println("message: ", string(message))
 		c.handleMessage(message)
 	}
 }
@@ -145,7 +146,6 @@ func (c *Client) handleSubscriptionMessage(subID uint64, message []byte) {
 	result := resultType.Interface()
 	err := decodeResponse(bytes.NewReader(message), &result)
 	if err != nil {
-		fmt.Println("*****************************")
 		c.closeSubscription(sub.req.ID, fmt.Errorf("unable to decode client response: %w", err))
 		return
 	}

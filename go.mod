@@ -6,6 +6,7 @@ require (
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.4 // indirect
 	filippo.io/edwards25519 v1.0.0-rc.1
 	github.com/GeertJohan/go.rice v1.0.0
+	github.com/davecgh/go-spew v1.1.1
 	github.com/fatih/color v1.9.0
 	github.com/google/go-cmp v0.5.6
 	github.com/gorilla/rpc v1.2.0
