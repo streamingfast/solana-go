@@ -125,7 +125,7 @@ var tokenRegistryRegisterCmd = &cobra.Command{
 			return fmt.Errorf("unable to sign transaction: %w", err)
 		}
 
-		trxHash, err := client.SendTransaction(cmd.Context(), trx, nil)
+		trxHash, err := client.SendTransaction(trx, nil)
 		if err != nil {
 			return fmt.Errorf("unable to send transaction: %w", err)
 		}

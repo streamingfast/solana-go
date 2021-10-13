@@ -2,6 +2,7 @@ package metaplex
 
 import (
 	"fmt"
+	"regexp"
 
 	"github.com/near/borsh-go"
 	"github.com/streamingfast/solana-go"
@@ -48,28 +49,14 @@ func (m *Metadata) Decode(in []byte) error {
 	if err != nil {
 		return fmt.Errorf("unpack: %w", err)
 	}
-
+	m.Data.Name = Clean(m.Data.Name)
+	m.Data.Symbol = Clean(m.Data.Symbol)
+	m.Data.URI = Clean(m.Data.URI)
 	return nil
 }
 
-func (m *Data) Decode(in []byte) error {
-	//err := borsh.Deserialize(m, in)
-	//if err != nil {
-	//	return fmt.Errorf("unpack: %w", err)
-	//}
+var METADATA_REPLACE = regexp.MustCompile("\u0000")
 
-	count := 0
-	for {
-		i := in[count:]
-		count++
-		err := borsh.Deserialize(m, i)
-		if err != nil {
-			//return fmt.Errorf("unpack: %w", err)
-			fmt.Println("err count:", count, len(i), err)
-			continue
-		}
-		fmt.Println("count:", count, len(i), "name:", m.Name)
-	}
-
-	return nil
+func Clean(str string) string {
+	return METADATA_REPLACE.ReplaceAllString(str, "")
 }

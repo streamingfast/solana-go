@@ -57,18 +57,23 @@ func getAndDisplayMetadata(ctx context.Context, metadataAddr solana.PublicKey) e
 	}
 
 	fmt.Println()
-	fmt.Println("Metadata Addr: ", metadataAddr.String())
-	fmt.Println("Name: ", metadata.Data.Name)
-	fmt.Println("Symbol: ", metadata.Data.Symbol)
-	fmt.Println("URI: ", metadata.Data.URI)
-	fmt.Println("Seller Basis Points: ", metadata.Data.SellerFeeBasisPoints)
-	if metadata.Data.Creators != nil {
-		fmt.Printf("%d creators\n", len(*metadata.Data.Creators))
+	fmt.Printf("Metadata Addr: %s\n", metadataAddr.String())
+	fmt.Printf("Mint: %s\n", metadata.Mint.String())
+	fmt.Printf("Udpate Authority: %s\n", metadata.UpdateAuthority.String())
+	fmt.Printf("Primary Sale Happened: %t\n", metadata.PrimarySaleHappened)
+	fmt.Printf("Is Mutable: %t\n", metadata.IsMutable)
+	fmt.Println("Data")
+	fmt.Printf("> Name:%s \n", metadata.Data.Name)
+	fmt.Printf("> Symbol: %s\n", metadata.Data.Symbol)
+	fmt.Printf("> URI: %s\n", metadata.Data.URI)
+	fmt.Printf("> Seller Basis Points: %d\n", metadata.Data.SellerFeeBasisPoints)
+	if metadata.Data.Creators != nil && len(*metadata.Data.Creators) > 0 {
+		fmt.Printf("> %d creators\n", len(*metadata.Data.Creators))
 		for _, creator := range *metadata.Data.Creators {
 			fmt.Printf("> %s %d %s\n", creator.Address.String(), creator.Share, creator.Verified)
 		}
 	} else {
-		fmt.Println("No creators found")
+		fmt.Println("> No creators found")
 	}
 
 	return nil
