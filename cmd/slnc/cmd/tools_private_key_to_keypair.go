@@ -15,32 +15,42 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/streamingfast/solana-go"
 )
 
-var fromBytesPrivateKeytoolsCmd = &cobra.Command{
-	Use:   "from-bytes",
-	Short: "Converts a private key to byte array",
-	Args:  cobra.ExactArgs(01),
+var toKeypairPrivateKeyToolsCmd = &cobra.Command{
+	Use:   "to-keypair",
+	Short: "Converts base58 private key to a byte array",
+	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		privateKey := args[0]
-
-		var values []uint8
-		err := json.Unmarshal([]byte(privateKey), &values)
+		keypairPath := args[1]
+		fmt.Println("Converting: ", privateKey)
+		pkey, err := solana.PrivateKeyFromBase58(privateKey)
 		if err != nil {
-			return fmt.Errorf("unable to unmarshall byte array: %w", err)
+			return fmt.Errorf("unable to deo decode private key")
 		}
 
-		pkey := solana.PrivateKey(values[:])
-		fmt.Printf("%s\n", pkey.String())
+		values := []string{}
+		for _, b := range pkey {
+			values = append(values, fmt.Sprintf("%d", b))
+		}
+
+		cnt := fmt.Sprintf("[%s]", strings.Join(values, ","))
+		fmt.Println("Writing keypair: ", keypairPath)
+		if err := ioutil.WriteFile(keypairPath, []byte(cnt), os.ModePerm); err != nil {
+			return fmt.Errorf("unable to write file")
+		}
 		return nil
 	},
 }
 
 func init() {
-	privateKeytoolsCmd.AddCommand(fromBytesPrivateKeytoolsCmd)
+	privateKeytoolsCmd.AddCommand(toKeypairPrivateKeyToolsCmd)
 }
