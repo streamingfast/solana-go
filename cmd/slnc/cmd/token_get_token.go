@@ -23,8 +23,8 @@ import (
 	"github.com/streamingfast/solana-go/programs/token"
 )
 
-var tokenGetTokenCmd = &cobra.Command{
-	Use:   "token {token_addr}",
+var tokenGetAccountCmd = &cobra.Command{
+	Use:   "account {account_addr}",
 	Short: "Retrieves token information",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -65,5 +65,5 @@ var tokenGetTokenCmd = &cobra.Command{
 }
 
 func init() {
-	tokenGetCmd.AddCommand(tokenGetMintCmd)
+	tokenGetCmd.AddCommand(tokenGetAccountCmd)
 }
