@@ -43,7 +43,7 @@ var tokenGetAccountCmd = &cobra.Command{
 		}
 
 		account := &token.Account{}
-		if err := account.Decode(acct.Value.Data); err != nil {
+		if err := account.Decode(tokenAddress, acct.Value.Data); err != nil {
 			return fmt.Errorf("unable to retrieve int information: %w", err)
 		}
 

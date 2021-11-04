@@ -18,7 +18,10 @@ func New(programID string, mint string) *Token {
 	return &Token{ProgramID: programID, Mint: mint}
 }
 
+const ACCOUNT_SIZE = 165
+
 type Account struct {
+	Key             solana.PublicKey `bin:"-"`
 	Mint            solana.PublicKey
 	Owner           solana.PublicKey
 	Amount          bin.Uint64
@@ -30,12 +33,13 @@ type Account struct {
 	DelegatedAmount bin.Uint64
 }
 
-func (a *Account) Decode(in []byte) error {
+func (a *Account) Decode(key solana.PublicKey, in []byte) error {
 	decoder := bin.NewDecoder(in)
 	err := decoder.Decode(&a)
 	if err != nil {
 		return fmt.Errorf("unpack: %w", err)
 	}
+	a.Key = key
 	return nil
 }
 

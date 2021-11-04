@@ -21,7 +21,6 @@ import (
 	bin "github.com/streamingfast/binary"
 	"github.com/streamingfast/solana-go"
 	"github.com/streamingfast/solana-go/programs/system"
-	"github.com/streamingfast/solana-go/programs/token"
 	"github.com/streamingfast/solana-go/text"
 )
 
@@ -124,6 +123,7 @@ func NewCreateInstruction(
 	associatedTokenAccount solana.PublicKey,
 	associatedTokenAccountWallet solana.PublicKey,
 	mint solana.PublicKey,
+	tokenProgramId solana.PublicKey,
 ) *Instruction {
 	return &Instruction{
 		BaseVariant: bin.BaseVariant{
@@ -135,7 +135,7 @@ func NewCreateInstruction(
 					AssociatedTokenAccountWallet: &solana.AccountMeta{PublicKey: associatedTokenAccountWallet},
 					Mint:                         &solana.AccountMeta{PublicKey: mint},
 					SystemProgram:                &solana.AccountMeta{PublicKey: system.PROGRAM_ID},
-					SPLTokenProgram:              &solana.AccountMeta{PublicKey: token.PROGRAM_ID},
+					SPLTokenProgram:              &solana.AccountMeta{PublicKey: tokenProgramId},
 					RentProgram:                  &solana.AccountMeta{PublicKey: system.SYSVAR_RENT},
 				},
 			},

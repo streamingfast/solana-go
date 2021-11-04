@@ -70,7 +70,7 @@ func getAndDisplayMetadata(ctx context.Context, metadataAddr solana.PublicKey) e
 	if metadata.Data.Creators != nil && len(*metadata.Data.Creators) > 0 {
 		fmt.Printf("> %d creators\n", len(*metadata.Data.Creators))
 		for _, creator := range *metadata.Data.Creators {
-			fmt.Printf("> %s %d %s\n", creator.Address.String(), creator.Share, creator.Verified)
+			fmt.Printf("> %s %d %T\n", creator.Address.String(), creator.Share, creator.Verified)
 		}
 	} else {
 		fmt.Println("> No creators found")

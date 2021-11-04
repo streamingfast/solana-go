@@ -81,6 +81,13 @@ func (i *Instruction) Accounts() (out []*solana.AccountMeta) {
 	case 0:
 		accounts := i.Impl.(*InitializeMint).Accounts
 		out = []*solana.AccountMeta{accounts.Mint, accounts.RentProgram}
+	case 3:
+		accounts := i.Impl.(*Transfer).Accounts
+		out = []*solana.AccountMeta{
+			accounts.Source,
+			accounts.Destination,
+			accounts.From,
+		}
 	case 6:
 		accounts := i.Impl.(*SetAuthority).Accounts
 		out = []*solana.AccountMeta{
@@ -172,10 +179,35 @@ func (i *InitializeMint) SetAccounts(accounts []*solana.AccountMeta) error {
 }
 
 type TransferAccounts struct {
+	Source      *solana.AccountMeta
+	Destination *solana.AccountMeta
+	From        *solana.AccountMeta
 }
 
 type Transfer struct {
+	Amount   uint64
 	Accounts *TransferAccounts
+}
+
+func NewTransferInstruction(
+	amount uint64,
+	source solana.PublicKey,
+	destination solana.PublicKey,
+	from solana.PublicKey,
+) *Instruction {
+	return &Instruction{
+		BaseVariant: bin.BaseVariant{
+			TypeID: 3,
+			Impl: &Transfer{
+				Amount: amount,
+				Accounts: &TransferAccounts{
+					Source:      &solana.AccountMeta{PublicKey: source, IsWritable: true},
+					Destination: &solana.AccountMeta{PublicKey: destination, IsWritable: true},
+					From:        &solana.AccountMeta{PublicKey: from, IsSigner: true},
+				},
+			},
+		},
+	}
 }
 
 type ApproveAccounts struct {
@@ -202,15 +234,6 @@ const (
 	AccountOwnerAuthorityType
 	CloseAccountAuthorityType
 )
-
-// Sets a new authority of a mint or account.
-//
-// Accounts expected by this instruction:
-//
-//   * Single authority
-//   0. `[writable]` The mint or account to change the authority of.
-//   1. `[signer]` The current authority of the mint or account.
-//
 
 type SetAuthority struct {
 	AuthorityType   AuthorityType

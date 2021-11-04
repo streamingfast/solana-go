@@ -30,6 +30,7 @@ import (
 var Version string
 
 const defaultRPCURL = "https://api.mainnet-beta.solana.com"
+const defaultWSURL = "wss://api.mainnet-beta.solana.com"
 
 // RootCmd represents the eosc command
 var RootCmd = &cobra.Command{
@@ -44,10 +45,10 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	RootCmd.PersistentFlags().StringP("vault-file", "", "./solana-vault.json", "Wallet file that contains encrypted key material")
-	RootCmd.PersistentFlags().StringP("rpc-url", "u", defaultRPCURL, "API endpoint of eos.io blockchain node")
+	RootCmd.PersistentFlags().StringP("rpc-url", "u", defaultRPCURL, "API endpoint of solana blockchain node")
+	RootCmd.PersistentFlags().String("ws-url", defaultWSURL, "websocket API endpoint of solana blockchain node")
 	RootCmd.PersistentFlags().StringSliceP("http-header", "H", []string{}, "HTTP header to add to JSON-RPC requests")
 	RootCmd.PersistentFlags().StringP("kms-gcp-keypath", "", "", "Path to the cryptoKeys within a keyRing on GCP")
-
 	RootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
 		cmd.SilenceErrors = true
 		cmd.SilenceUsage = true

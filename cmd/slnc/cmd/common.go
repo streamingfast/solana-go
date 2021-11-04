@@ -15,18 +15,21 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/streamingfast/solana-go/rpc/ws"
 
 	"github.com/spf13/viper"
 	"github.com/streamingfast/solana-go/rpc"
 	"github.com/streamingfast/solana-go/vault"
 )
 
-func getClient() *rpc.Client {
+func getClient(opt ...rpc.ClientOption) *rpc.Client {
 	httpHeaders := viper.GetStringSlice("global-http-header")
-	api := rpc.NewClient(sanitizeAPIURL(viper.GetString("global-rpc-url")))
+	api := rpc.NewClient(sanitizeAPIURL(viper.GetString("global-rpc-url")), opt...)
 
 	for i := 0; i < 25; i++ {
 		if val := os.Getenv(fmt.Sprintf("SLNC_GLOBAL_HTTP_HEADER_%d", i)); val != "" {
@@ -42,6 +45,20 @@ func getClient() *rpc.Client {
 		api.SetHeader(headerArray[0], headerArray[1])
 	}
 	return api
+}
+
+func getWsClient(ctx context.Context) (*ws.Client, error) {
+	wsURL := sanitizeAPIURL(viper.GetString("global-ws-url"))
+	if wsURL == "" {
+		return nil, fmt.Errorf("ws-url not defined")
+	}
+
+	cli := ws.NewClient(wsURL)
+	err := cli.Dial(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("unable to dial ws: %w", err)
+	}
+	return cli, nil
 }
 
 func sanitizeAPIURL(input string) string {
