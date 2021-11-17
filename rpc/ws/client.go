@@ -19,63 +19,66 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
-	"reflect"
-	"sync"
-	"time"
-
 	"github.com/gorilla/rpc/v2/json2"
 	"github.com/gorilla/websocket"
 	"github.com/streamingfast/solana-go/rpc"
 	"github.com/tidwall/gjson"
 	"go.uber.org/zap"
+	"io"
+	"reflect"
+	"sync"
+	"time"
 )
 
 type result interface{}
 
 type Client struct {
-	url                     string
-	conn                    *websocket.Conn
 	lock                    sync.RWMutex
 	subscriptionByRequestID map[uint64]*Subscription
 	subscriptionByWSSubID   map[uint64]*Subscription
+	websocket               *Websocket
 }
 
-func NewClient(wsURL string) *Client {
+func NewClient(wsURL string, verbose bool) *Client {
 	return &Client{
-		url:                     wsURL,
 		subscriptionByRequestID: map[uint64]*Subscription{},
 		subscriptionByWSSubID:   map[uint64]*Subscription{},
+		websocket: &Websocket{
+			url: wsURL,
+			Verbose: verbose,
+		},
 	}
+}
+
+func (c *Client) IsConnected() (bool) {
+	return c.websocket.isConnected
 }
 
 func (c *Client) Dial(ctx context.Context) (err error) {
-	if c.conn, _, err = websocket.DefaultDialer.DialContext(ctx, c.url, nil); err != nil {
-		return fmt.Errorf("new ws client: dial: %w", err)
-	}
-
+	err = c.websocket.Dial(c.websocket.url)
 	go func() {
 		for {
-			c.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
-			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+			if err := c.websocket.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
 			}
 			time.Sleep(20 * time.Second)
 		}
 	}()
 	go c.receiveMessages()
-	return nil
+	return err
 }
 
-func (c *Client) Close() {
-	c.conn.Close()
+func (c *Client) CloseAndReconnect() {
+	c.websocket.closeAndReconnect()
 }
 
 func (c *Client) receiveMessages() {
 	for {
-		_, message, err := c.conn.ReadMessage()
+		_, message, err := c.websocket.ReadMessage()
 		if err != nil {
+			zlog.Error("receiveMessages", zap.Error(err))
 			c.closeAllSubscription(err)
+			c.websocket.closeAndReconnect()
 			return
 		}
 		c.handleMessage(message)
@@ -93,7 +96,6 @@ func (c *Client) handleMessage(message []byte) {
 	}
 
 	c.handleSubscriptionMessage(uint64(gjson.GetBytes(message, "params.subscription").Int()), message)
-
 }
 
 func (c *Client) handleNewSubscriptionMessage(requestID, subID uint64) {
@@ -203,7 +205,7 @@ func (c *Client) unsubscribe(subID uint64, method string) error {
 		return fmt.Errorf("unable to encode unsubscription message for subID %d and method %s: %w", subID, method, err)
 	}
 
-	err = c.conn.WriteMessage(websocket.TextMessage, data)
+	err = c.websocket.WriteMessage(websocket.TextMessage, data)
 	if err != nil {
 		return fmt.Errorf("unable to send unsubscription message for subID %d and method %s: %w", subID, method, err)
 	}
@@ -211,7 +213,7 @@ func (c *Client) unsubscribe(subID uint64, method string) error {
 }
 
 func (c *Client) subscribe(params []interface{}, conf map[string]interface{}, subscriptionMethod, unsubscribeMethod string, commitment rpc.CommitmentType, resultType interface{}) (*Subscription, error) {
-	if c.conn == nil {
+	if c.websocket.Conn == nil {
 		return nil, fmt.Errorf("unable to subscribe without performing Dial(ctx context.Context) first")
 	}
 	c.lock.Lock()
@@ -236,7 +238,7 @@ func (c *Client) subscribe(params []interface{}, conf map[string]interface{}, su
 	)
 
 	zlog.Debug("writing data to conn", zap.String("data", string(data)))
-	err = c.conn.WriteMessage(websocket.TextMessage, data)
+	err = c.websocket.WriteMessage(websocket.TextMessage, data)
 	if err != nil {
 		return nil, fmt.Errorf("unable to write request: %w", err)
 	}
