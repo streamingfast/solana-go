@@ -69,6 +69,7 @@ func (c *Client) Dial(ctx context.Context) (err error) {
 }
 
 func (c *Client) CloseAndReconnect() {
+	c.closeAllSubscription(nil)
 	c.websocket.closeAndReconnect()
 }
 
@@ -77,8 +78,7 @@ func (c *Client) receiveMessages() {
 		_, message, err := c.websocket.ReadMessage()
 		if err != nil {
 			zlog.Error("receiveMessages", zap.Error(err))
-			c.closeAllSubscription(err)
-			c.websocket.closeAndReconnect()
+			c.CloseAndReconnect()
 			return
 		}
 		c.handleMessage(message)
@@ -213,7 +213,7 @@ func (c *Client) unsubscribe(subID uint64, method string) error {
 }
 
 func (c *Client) subscribe(params []interface{}, conf map[string]interface{}, subscriptionMethod, unsubscribeMethod string, commitment rpc.CommitmentType, resultType interface{}) (*Subscription, error) {
-	if c.websocket.Conn == nil {
+	if !c.websocket.IsConnected() {
 		return nil, fmt.Errorf("unable to subscribe without performing Dial(ctx context.Context) first")
 	}
 	c.lock.Lock()
