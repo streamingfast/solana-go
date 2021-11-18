@@ -44,13 +44,13 @@ func NewClient(wsURL string, verbose bool) *Client {
 		subscriptionByRequestID: map[uint64]*Subscription{},
 		subscriptionByWSSubID:   map[uint64]*Subscription{},
 		websocket: &Websocket{
-			url: wsURL,
+			url:     wsURL,
 			Verbose: verbose,
 		},
 	}
 }
 
-func (c *Client) IsConnected() (bool) {
+func (c *Client) IsConnected() bool {
 	return c.websocket.isConnected
 }
 
@@ -69,7 +69,7 @@ func (c *Client) Dial(ctx context.Context) (err error) {
 }
 
 func (c *Client) CloseAndReconnect() {
-	c.closeAllSubscription(nil)
+	c.closeAllSubscriptions(nil)
 	c.websocket.closeAndReconnect()
 }
 
@@ -117,9 +117,9 @@ func (c *Client) handleNewSubscriptionMessage(requestID, subID uint64) {
 		)
 		return
 	}
+
 	callBack.subID = subID
 	c.subscriptionByWSSubID[subID] = callBack
-
 	zlog.Debug("registered ws subscription",
 		zap.Uint64("subscription_id", subID),
 		zap.Uint64("request_id", requestID),
@@ -164,7 +164,7 @@ func (c *Client) handleSubscriptionMessage(subID uint64, message []byte) {
 	sub.stream <- result
 }
 
-func (c *Client) closeAllSubscription(err error) {
+func (c *Client) closeAllSubscriptions(err error) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
@@ -216,8 +216,10 @@ func (c *Client) subscribe(params []interface{}, conf map[string]interface{}, su
 	if !c.websocket.IsConnected() {
 		return nil, fmt.Errorf("unable to subscribe without performing Dial(ctx context.Context) first")
 	}
+
 	c.lock.Lock()
 	defer c.lock.Unlock()
+
 	if commitment != "" {
 		conf["commitment"] = string(commitment)
 	}
