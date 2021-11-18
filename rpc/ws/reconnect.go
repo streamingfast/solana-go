@@ -88,6 +88,9 @@ func (ws *Websocket) WriteMessage(messageType int, data []byte) error {
 	err := ErrNotConnected
 
 	if ws.IsConnected() {
+		ws.mu.Lock()
+		defer ws.mu.Unlock()
+
 		err = ws.Conn.WriteMessage(messageType, data)
 		if err != nil {
 			if ws.OnWriteError != nil {
@@ -118,6 +121,8 @@ func (ws *Websocket) ReadMessage() (messageType int, message []byte, err error) 
 
 func (ws *Websocket) Close() {
 	ws.mu.Lock()
+	defer ws.mu.Unlock()
+
 	if ws.Conn != nil {
 		err := ws.Conn.Close()
 		if err == nil && ws.isConnected && ws.OnDisconnect != nil {
@@ -129,7 +134,6 @@ func (ws *Websocket) Close() {
 	}
 
 	ws.isConnected = false
-	ws.mu.Unlock()
 }
 
 func (ws *Websocket) closeAndReconnect() {
