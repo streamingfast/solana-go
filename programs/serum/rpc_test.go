@@ -62,7 +62,7 @@ func TestStreamOpenOrders(t *testing.T) {
 		return
 	}
 
-	client := ws.NewClient(rpcURL)
+	client := ws.NewClient(rpcURL, false)
 	err := client.Dial(context.Background())
 	require.NoError(t, err)
 

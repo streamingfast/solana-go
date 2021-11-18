@@ -19,15 +19,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"reflect"
+	"sync"
+	"time"
+
 	"github.com/gorilla/rpc/v2/json2"
 	"github.com/gorilla/websocket"
 	"github.com/streamingfast/solana-go/rpc"
 	"github.com/tidwall/gjson"
 	"go.uber.org/zap"
-	"io"
-	"reflect"
-	"sync"
-	"time"
 )
 
 type result interface{}
@@ -66,6 +67,10 @@ func (c *Client) Dial(ctx context.Context) (err error) {
 	}()
 	go c.receiveMessages()
 	return err
+}
+
+func (c *Client) Close() {
+	c.websocket.Close()
 }
 
 func (c *Client) CloseAndReconnect() {

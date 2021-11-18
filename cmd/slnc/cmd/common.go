@@ -53,7 +53,7 @@ func getWsClient(ctx context.Context) (*ws.Client, error) {
 		return nil, fmt.Errorf("ws-url not defined")
 	}
 
-	cli := ws.NewClient(wsURL)
+	cli := ws.NewClient(wsURL, false)
 	err := cli.Dial(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("unable to dial ws: %w", err)

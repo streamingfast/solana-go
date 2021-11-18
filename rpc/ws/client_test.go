@@ -31,7 +31,7 @@ func Test_AccountSubscribe(t *testing.T) {
 
 	zlog, _ = zap.NewDevelopment()
 
-	c := NewClient("ws://api.mainnet-beta.solana.com:80/rpc")
+	c := NewClient("ws://api.mainnet-beta.solana.com:80/rpc", false)
 	err := c.Dial(context.Background())
 	require.NoError(t, err)
 	defer c.Close()
@@ -55,7 +55,7 @@ func Test_ProgramSubscribe(t *testing.T) {
 
 	zlog, _ = zap.NewDevelopment()
 
-	c := NewClient("wss://solana-api.projectserum.com")
+	c := NewClient("wss://solana-api.projectserum.com", false)
 	err := c.Dial(context.Background())
 	require.NoError(t, err)
 
@@ -80,7 +80,7 @@ func Test_SlotSubscribe(t *testing.T) {
 
 	zlog, _ = zap.NewDevelopment()
 
-	c := NewClient("ws://api.mainnet-beta.solana.com:80/rpc")
+	c := NewClient("ws://api.mainnet-beta.solana.com:80/rpc", false)
 	err := c.Dial(context.Background())
 	require.NoError(t, err)
 	defer c.Close()
