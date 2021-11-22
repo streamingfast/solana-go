@@ -18,14 +18,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/streamingfast/solana-go"
+	associatedtokenaccount "github.com/streamingfast/solana-go/programs/associated-token-account"
+	"github.com/streamingfast/solana-go/rpc"
 	"github.com/streamingfast/solana-go/rpc/confirm"
 	"github.com/streamingfast/solana-go/rpc/ws"
-
-	associatedtokenaccount "github.com/streamingfast/solana-go/programs/associated-token-account"
-
-	"github.com/streamingfast/solana-go"
-
-	"github.com/streamingfast/solana-go/rpc"
 )
 
 //go:generate rice embed-go
@@ -132,4 +129,37 @@ func TransferToken(ctx context.Context, rpcCli *rpc.Client, wsCli *ws.Client, am
 	}
 
 	return recipientSPLTokenAccount, trxHash, nil
+}
+
+func DoCloseAccount(ctx context.Context, rpcCli *rpc.Client, wsCli *ws.Client, account, destination, owner solana.PublicKey, sender *solana.Account) (string, error) {
+	blockHashResult, err := rpcCli.GetRecentBlockhash(ctx, rpc.CommitmentFinalized)
+	if err != nil {
+		return "", fmt.Errorf("unable retrieve recent block hash: %w", err)
+	}
+
+	trx, err := solana.NewTransaction(
+		[]solana.Instruction{
+			NewCloseAccount(account, destination, owner),
+		},
+		blockHashResult.Value.Blockhash,
+	)
+	if err != nil {
+		return "", fmt.Errorf("unable to craft transaction: %w", err)
+	}
+
+	_, err = trx.Sign(func(key solana.PublicKey) *solana.PrivateKey {
+		// create account need to be signed by the private key of the new account
+		// that is not in the vault and will be lost after the execution.
+		if key == sender.PublicKey() {
+			return &sender.PrivateKey
+		}
+		return nil
+	})
+
+	trxHash, err := confirm.SendAndConfirmTransaction(ctx, rpcCli, wsCli, trx)
+	if err != nil {
+		return "", fmt.Errorf("unable to send transaction: %w", err)
+	}
+
+	return trxHash, nil
 }
