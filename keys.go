@@ -101,6 +101,9 @@ func PublicKeyFromBytes(in []byte) (out PublicKey) {
 	copy(out[:], in[0:max])
 	return
 }
+func (p PublicKey) ToSlice() []byte {
+	return p[:]
+}
 
 func MustPublicKeyFromBase58(in string) PublicKey {
 	out, err := PublicKeyFromBase58(in)

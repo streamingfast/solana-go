@@ -55,6 +55,14 @@ func NewSignatureFromString(in string) (out Signature, err error) {
 	return NewSignatureFromBytes(bytes)
 }
 
+func MustSignatureFromString(in string) (out Signature) {
+	out, err := NewSignatureFromString(in)
+	if err != nil {
+		panic(err)
+	}
+	return
+}
+
 func NewSignatureFromBase58(in string) (out Signature, err error) {
 	bytes, err := base58.Decode(in)
 	if err != nil {
@@ -63,19 +71,22 @@ func NewSignatureFromBase58(in string) (out Signature, err error) {
 
 	return NewSignatureFromBytes(bytes)
 }
-
-func (p Signature) MarshalJSON() ([]byte, error) {
-	return json.Marshal(base58.Encode(p[:]))
+func (s Signature) ToSlice() []byte {
+	return s[:]
 }
 
-func (p *Signature) UnmarshalJSON(data []byte) (err error) {
-	var s string
+func (s Signature) MarshalJSON() ([]byte, error) {
+	return json.Marshal(base58.Encode(s[:]))
+}
+
+func (s *Signature) UnmarshalJSON(data []byte) (err error) {
+	var str string
 	err = json.Unmarshal(data, &s)
 	if err != nil {
 		return
 	}
 
-	dat, err := base58.Decode(s)
+	dat, err := base58.Decode(str)
 	if err != nil {
 		return err
 	}
@@ -86,7 +97,7 @@ func (p *Signature) UnmarshalJSON(data []byte) (err error) {
 
 	target := Signature{}
 	copy(target[:], dat)
-	*p = target
+	*s = target
 	return
 }
 
@@ -94,8 +105,8 @@ func (s Signature) Verify(publicKey PublicKey, message []byte) bool {
 	return ed25519.Verify(ed25519.PublicKey(publicKey[:]), message, s[:])
 }
 
-func (p Signature) String() string {
-	return base58.Encode(p[:])
+func (s Signature) String() string {
+	return base58.Encode(s[:])
 }
 
 ///
