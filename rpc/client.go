@@ -370,12 +370,16 @@ func (t *withLoggingRoundTripper) RoundTrip(request *http.Request) (*http.Respon
 	traceEnabled := t.tracer.Enabled()
 
 	if debugEnabled {
-		requestDump, err := httputil.DumpRequestOut(request, true)
-		if err != nil {
-			panic(fmt.Errorf("unexpecting that httputil.DumpRequestOut would panic: %w", err))
-		}
+		if traceEnabled {
+			requestDump, err := httputil.DumpRequestOut(request, true)
+			if err != nil {
+				panic(fmt.Errorf("unexpecting that httputil.DumpRequestOut would panic: %w", err))
+			}
 
-		logger.Debug("JSON-RPC request\n" + string(requestDump))
+			logger.Debug("JSON-RPC request\n" + string(requestDump))
+		} else {
+			logger.Debug(fmt.Sprintf("JSON-RPC request %s %s", request.Method, request.URL.String()))
+		}
 	}
 
 	response, err := http.DefaultTransport.RoundTrip(request)
@@ -384,12 +388,16 @@ func (t *withLoggingRoundTripper) RoundTrip(request *http.Request) (*http.Respon
 	}
 
 	if debugEnabled {
-		responseDump, err := httputil.DumpResponse(response, traceEnabled)
-		if err != nil {
-			panic(fmt.Errorf("unexpecting that httputil.DumpRequestOut would panic: %w", err))
-		}
+		if traceEnabled {
+			responseDump, err := httputil.DumpResponse(response, true)
+			if err != nil {
+				panic(fmt.Errorf("unexpecting that httputil.DumpRequestOut would panic: %w", err))
+			}
 
-		logger.Debug("JSON-RPC response\n" + string(responseDump))
+			logger.Debug("JSON-RPC response\n" + string(responseDump))
+		} else {
+			logger.Debug(fmt.Sprintf("JSON-RPC response %s (%d bytes)", response.Status, response.ContentLength))
+		}
 	}
 
 	return response, nil
