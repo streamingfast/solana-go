@@ -90,6 +90,37 @@ func FetchAccountsForOwner(ctx context.Context, rpcCli *rpc.Client, owner solana
 	return
 }
 
+func FetchAccountHolders(ctx context.Context, rpcCli *rpc.Client, mint solana.PublicKey) (out []*Account, err error) {
+	resp, err := rpcCli.GetProgramAccounts(
+		ctx,
+		PROGRAM_ID,
+		&rpc.GetProgramAccountsOpts{
+			Filters: []rpc.RPCFilter{
+				{DataSize: ACCOUNT_SIZE},
+				{Memcmp: &rpc.RPCFilterMemcmp{Offset: 0, Bytes: mint[:]}},
+			},
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+	if resp == nil {
+		return nil, fmt.Errorf("resp empty... program account not found")
+	}
+
+	for _, keyedAcct := range resp {
+		acct := keyedAcct.Account
+
+		a := &Account{}
+		if err := a.Decode(keyedAcct.Pubkey, acct.Data); err != nil {
+			return nil, fmt.Errorf("unable to decode mint %q: %w", acct.Owner.String(), err)
+		}
+		out = append(out, a)
+
+	}
+	return
+}
+
 func TransferToken(ctx context.Context, rpcCli *rpc.Client, wsCli *ws.Client, amount uint64, senderSPLTokenAccount, mint, recipient solana.PublicKey, sender *solana.Account) (solana.PublicKey, string, error) {
 	blockHashResult, err := rpcCli.GetRecentBlockhash(ctx, rpc.CommitmentFinalized)
 	if err != nil {
