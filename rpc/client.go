@@ -407,7 +407,7 @@ type TransactionError struct {
 	rpcError             *jsonrpc.RPCError
 	InstructionIndex     uint64
 	Logs                 []string
-	InstructionErrorCode json.Number
+	InstructionErrorCode string
 	InstructionErrorType string
 }
 
@@ -426,12 +426,20 @@ func fromRPCError(rpcError *jsonrpc.RPCError) *TransactionError {
 				if instErr, ok := instructionError[1].(map[string]interface{}); ok {
 					for instErrType, instErrCode := range instErr {
 						transactionErr.InstructionErrorType = instErrType
-						transactionErr.InstructionErrorCode = instErrCode.(json.Number)
+
+						if str, ok := instErrCode.(string); ok {
+							transactionErr.InstructionErrorCode = str
+						} else if num, ok := instErrCode.(json.Number); ok {
+							transactionErr.InstructionErrorCode = fmt.Sprintf("%s", num)
+						} else {
+							transactionErr.InstructionErrorCode = "unkown"
+						}
 					}
 				}
 			}
 		}
 	}
+
 	if logs, ok := v["logs"].([]interface{}); ok {
 		for _, log := range logs {
 			transactionErr.Logs = append(transactionErr.Logs, log.(string))
