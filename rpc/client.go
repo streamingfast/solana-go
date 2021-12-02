@@ -316,7 +316,7 @@ func (c *Client) callFor(out interface{}, method string, params ...interface{}) 
 	startTime := time.Now()
 	decodingTime := time.Time{}
 
-	logger.Info("performing JSON-RPC call", fields...)
+	logger.Debug("performing JSON-RPC call", fields...)
 	defer func() {
 		fields := []zapcore.Field{}
 		if !decodingTime.IsZero() {
@@ -324,7 +324,7 @@ func (c *Client) callFor(out interface{}, method string, params ...interface{}) 
 		}
 		fields = append(fields, zap.Duration("overall", time.Since(startTime)))
 
-		logger.Info("performed JSON-RPC call", fields...)
+		logger.Debug("performed JSON-RPC call", fields...)
 	}()
 
 	_ = ctx
