@@ -87,7 +87,7 @@ type LogResult struct {
 		Slot uint64
 	} `json:"context"`
 	Value struct {
-		SignatureResult
-		Logs []string `json:"logs"`
+		Signature string   `json:"signature"`
+		Logs      []string `json:"logs"`
 	} `json:"value"`
 }
