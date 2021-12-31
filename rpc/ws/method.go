@@ -24,3 +24,11 @@ func (c *Client) SlotSubscribe() (*Subscription, error) {
 func (c *Client) SignatureSubscribe(signature string, commitment rpc.CommitmentType) (*Subscription, error) {
 	return c.subscribe([]interface{}{signature}, base64Conf, "signatureSubscribe", "signatureUnsubscribe", commitment, SignatureResult{})
 }
+
+func (c *Client) LogSubscribe(account solana.PublicKey, commitment rpc.CommitmentType) (*Subscription, error) {
+	return c.subscribe([]interface{}{
+		map[string][]string{
+			"mentions": {account.String()},
+		},
+	}, base64Conf, "logsSubscribe", "logsUnsubscribe", commitment, LogResult{})
+}
