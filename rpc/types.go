@@ -152,7 +152,6 @@ const (
 	CommitmentFinalized = CommitmentType("finalized")
 
 	// The following are deprecated
-
 	CommitmentMax          = CommitmentType("max")          // Deprecated as of v1.5.5
 	CommitmentRecent       = CommitmentType("recent")       // Deprecated as of v1.5.5
 	CommitmentRoot         = CommitmentType("root")         // Deprecated as of v1.5.5

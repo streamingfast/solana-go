@@ -17,6 +17,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"go.uber.org/zap"
 	"os"
 	"strings"
 
@@ -29,7 +30,9 @@ import (
 
 func getClient(opt ...rpc.ClientOption) *rpc.Client {
 	httpHeaders := viper.GetStringSlice("global-http-header")
-	api := rpc.NewClient(sanitizeAPIURL(viper.GetString("global-rpc-url")), opt...)
+	rpcURL := sanitizeAPIURL(viper.GetString("global-rpc-url"))
+	zlog.Debug("sanitized RPC URL", zap.String("rpc_url", rpcURL))
+	api := rpc.NewClient(rpcURL, opt...)
 
 	for i := 0; i < 25; i++ {
 		if val := os.Getenv(fmt.Sprintf("SLNC_GLOBAL_HTTP_HEADER_%d", i)); val != "" {

@@ -80,11 +80,18 @@ func (i *Instruction) Accounts() (out []*solana.AccountMeta) {
 			accounts.Account,
 			accounts.CurrentAuthority,
 		}
+	case 7:
+		accounts := i.Impl.(*MintTo).Accounts
+		out = []*solana.AccountMeta{
+			accounts.Mint,
+			accounts.Account,
+			accounts.MintAuthority,
+		}
 	case 9:
 		accounts := i.Impl.(*CloseAccount).Accounts
 		out = []*solana.AccountMeta{
 			accounts.Account,
-			accounts.Desination,
+			accounts.Destination,
 			accounts.Owner,
 		}
 	}
@@ -257,9 +264,39 @@ func NewSetAuthorityInstruction(
 }
 
 type MintToAccounts struct {
+	Mint          *solana.AccountMeta
+	Account       *solana.AccountMeta
+	MintAuthority *solana.AccountMeta
+
+	///   0. `[writable]` The mint.
+	///   1. `[writable]` The account to mint tokens to.
+	///   2. `[signer]` The mint's minting authority.
+
 }
 type MintTo struct {
-	Accounts *MintToAccounts
+	Amount   uint64
+	Accounts *MintToAccounts `bin:"-"`
+}
+
+func NewMintTo(
+	Amount uint64,
+	Mint solana.PublicKey,
+	Account solana.PublicKey,
+	MintAuthority solana.PublicKey,
+) *Instruction {
+	return &Instruction{
+		BaseVariant: bin.BaseVariant{
+			TypeID: 7,
+			Impl: &MintTo{
+				Amount: Amount,
+				Accounts: &MintToAccounts{
+					Mint:          &solana.AccountMeta{PublicKey: Mint, IsWritable: true},
+					Account:       &solana.AccountMeta{PublicKey: Account, IsWritable: true},
+					MintAuthority: &solana.AccountMeta{PublicKey: MintAuthority, IsSigner: true},
+				},
+			},
+		},
+	}
 }
 
 type BurnAccounts struct {
@@ -269,9 +306,9 @@ type Burn struct {
 }
 
 type CloseAccountAccounts struct {
-	Account    *solana.AccountMeta
-	Desination *solana.AccountMeta
-	Owner      *solana.AccountMeta
+	Account     *solana.AccountMeta
+	Destination *solana.AccountMeta
+	Owner       *solana.AccountMeta
 }
 
 type CloseAccount struct {
@@ -288,9 +325,9 @@ func NewCloseAccount(
 			TypeID: 9,
 			Impl: &CloseAccount{
 				Accounts: &CloseAccountAccounts{
-					Account:    &solana.AccountMeta{PublicKey: account, IsWritable: true},
-					Desination: &solana.AccountMeta{PublicKey: destination, IsWritable: true},
-					Owner:      &solana.AccountMeta{PublicKey: owner, IsSigner: true},
+					Account:     &solana.AccountMeta{PublicKey: account, IsWritable: true},
+					Destination: &solana.AccountMeta{PublicKey: destination, IsWritable: true},
+					Owner:       &solana.AccountMeta{PublicKey: owner, IsSigner: true},
 				},
 			},
 		},
