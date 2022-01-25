@@ -15,7 +15,8 @@ var PROGRAM_ID = solana.MustPublicKeyFromBase58("metaqbxxUerdq28cj1RbAWkYQm3ybzj
 type InstType uint8
 
 const (
-	CreateMetadataObjectIns InstType = iota
+	CreateMetadataAccountInst InstType = iota
+	UpdateMetadataAccountInst
 )
 
 type AccountListable interface {
@@ -39,7 +40,7 @@ func (i *Instruction) Data() ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("borsh serailize: %w", err)
 	}
-	zlog.Debug("encodded solgun instruction", zap.String("data", hex.EncodeToString(data)))
+	zlog.Debug("encodded metaplex instruction", zap.String("data", hex.EncodeToString(data)))
 	return data, nil
 }
 
