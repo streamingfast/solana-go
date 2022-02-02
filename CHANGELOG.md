@@ -15,6 +15,10 @@ date.
 
 ## [v0.5.0](https://github.com/streamingfast/solana-go/releases/v0.4.0) (Feb 02, 2022)
 
+### Change
+
+* Open up `rpc.Client#DoRequest` so that new RPC can be implemented easily even if not present in the library directly.
+
 ### Breaking
 
 * Moved `cmd/slnc` (and related packages `cli` and `vault`) to its own repository.
