@@ -1,4 +1,4 @@
-project_name: eos-go
+project_name: solana-go
 
 env_files:
   github_token: ~/.config/goreleaser/github_token
