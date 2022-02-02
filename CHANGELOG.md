@@ -13,6 +13,8 @@ date.
 
 ## Unreleased
 
+## [v0.5.0](https://github.com/streamingfast/solana-go/releases/v0.4.0) (Feb 02, 2022)
+
 ### Breaking
 
 * Moved `cmd/slnc` (and related packages `cli` and `vault`) to its own repository.
@@ -29,17 +31,17 @@ date.
 * def18e6 Serialize Data the same way it is deserialized.
 * 23a4683 Downgrade logging
 
-## [v0.4.0](https://github.com/streamingfast/solana-go/releases/edit/v0.3.0) (Nov 25, 2021)
+## [v0.4.0](https://github.com/streamingfast/solana-go/releases/v0.4.0) (Nov 25, 2021)
 
 * d541cb7 Reduced logging verbosity of some elements in `rpc.Client`.
 
-## [v0.3.0](https://github.com/streamingfast/solana-go/releases/edit/v0.3.0) (Nov 18, 2021)
+## [v0.3.0](https://github.com/streamingfast/solana-go/releases/v0.3.0) (Nov 18, 2021)
 
 * a361bc6 Reconnection logic when RPC nodes go down.
 
 ### Changes
 
-## [v0.2.0](https://github.com/streamingfast/solana-go/releases/edit/v0.2.0) (Nov 27, 2020)
+## [v0.2.0](https://github.com/streamingfast/solana-go/releases/v0.2.0) (Nov 27, 2020)
 
 * d64d73f Add program id for token registry mainnet
 * e22f933 Added dex instruction decoding
