@@ -81,3 +81,13 @@ type SignatureResult struct {
 		Err interface{} `json:"err"`
 	} `json:"value"`
 }
+
+type LogResult struct {
+	Context struct {
+		Slot uint64
+	} `json:"context"`
+	Value struct {
+		Signature string   `json:"signature"`
+		Logs      []string `json:"logs"`
+	} `json:"value"`
+}
