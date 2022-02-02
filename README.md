@@ -71,6 +71,45 @@ import "github.com/streamingfast/solana-go/token"
 
 ```
 
+## Examples
+
+### Reference
+
+ * RPC
+	* [Get Recent Blockhash](./example_rpc_get_recent_blockhash_test.go)
+ * WebSocket
+	* [Account Subscribe](./example_ws_account_subscribe_test.go)
+
+### Running
+
+The easiest way to see the actual output for a given example is to add a line
+`// Output: any` at the very end of the test, looks like this for
+`ExampleRPC_GetRecentBlockhash` file ([example_rpc_get_recent_blockhash_test.go](./example_rpc_get_recent_blockhash_test.go)):
+
+```
+	...
+
+    fmt.Println(string(bytes))
+    // Output: any
+}
+```
+
+This tells `go test` that it can execute this test correctly. Then, simply
+run only this example:
+
+    go test -run ExampleRPC_GetRecentBlockhash
+
+Replacing `ExampleRPC_GetRecentBlockhash` with the actual example name you want to try
+out where line `// Output: any` was added.
+
+This will run the example and compares the standard output with the `any` which
+will fail. But it's ok an expected, so you can see the actual output
+printed to your terminal.
+
+> WebSocket examples runs for a 1 minute then exits, you will not see anything until the example finish
+> RPC URL to use can be specified by using environment variable `SOLANA_GO_RPC_URL`, defaults to https://api.mainnet-beta.solana.com.
+> WS URL to use can be specified by using environment variable `SOLANA_GO_WS_URL`, defaults to ws://api.mainnet-beta.solana.com.
+
 ## Contributing
 
 **Issues and PR in this repo related strictly to the solana go library.**
