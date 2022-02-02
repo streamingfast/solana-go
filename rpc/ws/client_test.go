@@ -17,11 +17,9 @@ package ws
 import (
 	"context"
 	"fmt"
-	"os"
 	"testing"
 
 	"github.com/streamingfast/solana-go"
-	"github.com/streamingfast/solana-go/text"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 )
@@ -45,7 +43,7 @@ func Test_AccountSubscribe(t *testing.T) {
 		fmt.Println("receive an error: ", err)
 		return
 	}
-	text.NewEncoder(os.Stdout).Encode(data, nil)
+
 	fmt.Println("OpenOrders: ", data.(*AccountResult).Value.Account.Owner)
 	fmt.Println("data: ", data.(*AccountResult).Value.Account.Data)
 }
