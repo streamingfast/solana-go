@@ -90,7 +90,7 @@ func (c *Client) GetBalance(ctx context.Context, publicKey string, commitment Co
 		params = append(params, commit)
 	}
 
-	err = c.callFor(&out, "getBalance", params...)
+	err = c.DoRequest(&out, "getBalance", params...)
 	return
 }
 
@@ -103,7 +103,7 @@ func (c *Client) GetRecentBlockhash(ctx context.Context, commitment CommitmentTy
 		params = append(params, commit)
 	}
 
-	err = c.callFor(&out, "getRecentBlockhash", params)
+	err = c.DoRequest(&out, "getRecentBlockhash", params)
 	return
 }
 
@@ -116,7 +116,7 @@ func (c *Client) GetSlot(ctx context.Context, commitment CommitmentType) (out Ge
 		params = append(params, commit)
 	}
 
-	err = c.callFor(&out, "getSlot", params)
+	err = c.DoRequest(&out, "getSlot", params)
 	return
 }
 
@@ -126,7 +126,7 @@ func (c *Client) GetConfirmedBlock(ctx context.Context, slot uint64, encoding st
 	}
 	params := []interface{}{slot, encoding}
 
-	err = c.callFor(&out, "getConfirmedBlock", params...)
+	err = c.DoRequest(&out, "getConfirmedBlock", params...)
 	return
 }
 
@@ -136,7 +136,7 @@ func (c *Client) GetAccountInfo(ctx context.Context, account solana.PublicKey) (
 	}
 	params := []interface{}{account, obj}
 
-	err = c.callFor(&out, "getAccountInfo", params...)
+	err = c.DoRequest(&out, "getAccountInfo", params...)
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +160,7 @@ func (c *Client) GetAccountDataIn(ctx context.Context, account solana.PublicKey,
 func (c *Client) GetConfirmedTransaction(ctx context.Context, signature string) (out TransactionWithMeta, err error) {
 	params := []interface{}{signature, "json"}
 
-	err = c.callFor(&out, "getConfirmedTransaction", params...)
+	err = c.DoRequest(&out, "getConfirmedTransaction", params...)
 	return
 }
 
@@ -168,14 +168,14 @@ func (c *Client) GetConfirmedSignaturesForAddress2(ctx context.Context, address 
 
 	params := []interface{}{address.String(), opts}
 
-	err = c.callFor(&out, "getConfirmedSignaturesForAddress2", params...)
+	err = c.DoRequest(&out, "getConfirmedSignaturesForAddress2", params...)
 	return
 }
 
 func (c *Client) GetSignaturesForAddress(ctx context.Context, address solana.PublicKey, opts *GetSignaturesForAddressOpts) (out GetSignaturesForAddressResult, err error) {
 	params := []interface{}{address.String(), opts}
 
-	err = c.callFor(&out, "getSignaturesForAddress", params...)
+	err = c.DoRequest(&out, "getSignaturesForAddress", params...)
 	return
 }
 
@@ -194,13 +194,13 @@ func (c *Client) GetProgramAccounts(ctx context.Context, publicKey solana.Public
 
 	params := []interface{}{publicKey, obj}
 
-	err = c.callFor(&out, "getProgramAccounts", params...)
+	err = c.DoRequest(&out, "getProgramAccounts", params...)
 	return
 }
 
 func (c *Client) GetMinimumBalanceForRentExemption(ctx context.Context, dataSize int) (lamport int, err error) {
 	params := []interface{}{dataSize}
-	err = c.callFor(&lamport, "getMinimumBalanceForRentExemption", params...)
+	err = c.DoRequest(&lamport, "getMinimumBalanceForRentExemption", params...)
 	return
 }
 
@@ -227,7 +227,7 @@ func (c *Client) SimulateTransaction(ctx context.Context, transaction *solana.Tr
 	}
 
 	var out *SimulateTransactionResponse
-	if err := c.callFor(&out, "simulateTransaction", params...); err != nil {
+	if err := c.DoRequest(&out, "simulateTransaction", params...); err != nil {
 		return nil, fmt.Errorf("send transaction: rpc send: %w", err)
 	}
 
@@ -264,7 +264,7 @@ func (c *Client) SendTransaction(
 		obj,
 	}
 
-	if err := c.callFor(&signature, "sendTransaction", params...); err != nil {
+	if err := c.DoRequest(&signature, "sendTransaction", params...); err != nil {
 		var rpcError *jsonrpc.RPCError
 		if errors.As(err, &rpcError) {
 			instructionError := fromRPCError(rpcError)
@@ -294,13 +294,13 @@ func (c *Client) RequestAirdrop(ctx context.Context, account *solana.PublicKey, 
 		obj,
 	}
 
-	if err := c.callFor(&signature, "requestAirdrop", params...); err != nil {
+	if err := c.DoRequest(&signature, "requestAirdrop", params...); err != nil {
 		return "", fmt.Errorf("send transaction: rpc send: %w", err)
 	}
 	return
 }
 
-func (c *Client) callFor(out interface{}, method string, params ...interface{}) error {
+func (c *Client) DoRequest(out interface{}, method string, params ...interface{}) error {
 	request := jsonrpc.NewRequest(method, params...)
 	request.ID = c.requestIDGenerator()
 
