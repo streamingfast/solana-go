@@ -17,9 +17,13 @@ date.
 
 - Moved `cmd/slnc` (and related packages `cli` and `vault`) to its own repository.
 
+## [v0.4.0](https://github.com/streamingfast/solana-go/releases/edit/v0.3.0) (Nov 25, 2021)
+
+- d541cb7 Reduced logging verbosity of some elements in `rpc.Client`.
+
 ## [v0.3.0](https://github.com/streamingfast/solana-go/releases/edit/v0.3.0) (Nov 18, 2021)
 
-a361bc6 Reconnection logic when RPC nodes go down
+- a361bc6 Reconnection logic when RPC nodes go down.
 
 ### Changes
 
