@@ -15,8 +15,31 @@ var PROGRAM_ID = solana.MustPublicKeyFromBase58("metaqbxxUerdq28cj1RbAWkYQm3ybzj
 type InstType uint8
 
 const (
-	CreateMetadataAccountInst InstType = iota
-	UpdateMetadataAccountInst
+	CreateMetadataAccountV1Inst InstType = iota
+	UpdateMetadataAccountV1Inst
+	DeprecatedCreateMasterEditionInst
+	DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenInst
+	UpdatePrimarySaleHappenedViaTokenInst
+	DeprecatedSetReservationListInst
+	DeprecatedCreateReservationListInst
+	SignMetadataInst
+	DeprecatedMintPrintingTokensViaTokenInst
+	DeprecatedMintPrintingTokensInst
+	CreateMasterEditionInst
+	MintNewEditionFromMasterEditionViaTokenInst
+	ConvertMasterEditionV1ToV2Inst
+	MintNewEditionFromMasterEditionViaVaultProxyInst
+	PuffMetadataInst
+	UpdateMetadataAccountV2Inst
+	CreateMetadataAccountV2Inst
+	CreateMasterEditionV3Inst
+	VerifyCollectionInst
+	UtilizeInst
+	ApproveUseAuthorityInst
+	RevokeUseAuthorityInst
+	UnverifyCollectionInst
+	ApproveCollectionAuthorityInst
+	RevokeCollectionAuthorityInst
 )
 
 type AccountListable interface {

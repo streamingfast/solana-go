@@ -54,7 +54,7 @@ func NewCreateMetadataAccountInstruction(
 	updateAuthority solana.PublicKey,
 ) *Instruction {
 	var inst = CreateMetadataAccount{
-		Instruction: CreateMetadataAccountInst,
+		Instruction: CreateMetadataAccountV1Inst,
 		Data:        data,
 		IsMutable:   isMutable,
 		Accounts: &CreateMetadataAccountAccounts{

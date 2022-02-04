@@ -4,16 +4,16 @@ import (
 	"github.com/streamingfast/solana-go"
 )
 
-type UpdateMetadataAccount struct {
+type UpdateMetadataV1Account struct {
 	Instruction         InstType
 	Data                *Data
 	UpdateAuthority     *solana.PublicKey
 	PrimarySaleHappened *bool
 
-	Accounts *UpdateMetadataAccountAccounts `borsh_skip:"true"`
+	Accounts *UpdateMetadataAccountV1Accounts `borsh_skip:"true"`
 }
 
-func (i UpdateMetadataAccount) ListAccounts() []*solana.AccountMeta {
+func (i UpdateMetadataV1Account) ListAccounts() []*solana.AccountMeta {
 	return []*solana.AccountMeta{
 		i.Accounts.Metadata,
 		i.Accounts.UpdateAuthorityKey,
@@ -23,7 +23,7 @@ func (i UpdateMetadataAccount) ListAccounts() []*solana.AccountMeta {
 /// Update a Metadata
 ///   0. `[writable]` Metadata account
 ///   1. `[signer]` Update authority key
-type UpdateMetadataAccountAccounts struct {
+type UpdateMetadataAccountV1Accounts struct {
 	Metadata           *solana.AccountMeta
 	UpdateAuthorityKey *solana.AccountMeta
 }
@@ -37,7 +37,7 @@ type UpdateMetadataAccountAccounts struct {
 //   5. `[]` System program
 //   6. `[]` Rent info
 
-func NewUpdateMetadataAccountInstruction(
+func NewUpdateMetadataAccountV1Instruction(
 	programID solana.PublicKey,
 	data *Data,
 	updateAuthority *solana.PublicKey,
@@ -45,12 +45,12 @@ func NewUpdateMetadataAccountInstruction(
 	metadata solana.PublicKey,
 	updateAuthorityKey solana.PublicKey,
 ) *Instruction {
-	var inst = UpdateMetadataAccount{
-		Instruction:         UpdateMetadataAccountInst,
+	var inst = UpdateMetadataV1Account{
+		Instruction:         UpdateMetadataAccountV1Inst,
 		Data:                data,
 		UpdateAuthority:     updateAuthority,
 		PrimarySaleHappened: primarySaleHappened,
-		Accounts: &UpdateMetadataAccountAccounts{
+		Accounts: &UpdateMetadataAccountV1Accounts{
 			Metadata:           &solana.AccountMeta{PublicKey: metadata, IsWritable: true},
 			UpdateAuthorityKey: &solana.AccountMeta{PublicKey: updateAuthorityKey, IsSigner: true},
 		},
