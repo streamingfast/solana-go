@@ -5,15 +5,9 @@ import (
 	"reflect"
 
 	"github.com/streamingfast/logging"
-	"go.uber.org/zap"
 )
 
-var traceEnabled = logging.IsTraceEnabled("solana-go", "github.com/streamingfast/solana-go/diff")
-var zlog = zap.NewNop()
-
-func init() {
-	logging.Register("github.com/streamingfast/solana-go/diff", &zlog)
-}
+var zlog, tracer = logging.PackageLogger("solana-go", "github.com/streamingfast/solana-go/diff")
 
 type reflectType struct {
 	in interface{}

@@ -16,13 +16,6 @@ package solana
 
 import (
 	"github.com/streamingfast/logging"
-	"go.uber.org/zap"
 )
 
-var traceEnabled = logging.IsTraceEnabled("solana-go", "github.com/streamingfast/solana-go")
-
-var zlog = zap.NewNop()
-
-func init() {
-	logging.Register("github.com/streamingfast/solana-go", &zlog)
-}
+var zlog, _ = logging.PackageLogger("solana-go", "github.com/streamingfast/solana-go")

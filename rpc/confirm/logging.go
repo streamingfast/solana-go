@@ -16,8 +16,6 @@ package confirm
 
 import (
 	"github.com/streamingfast/logging"
-	"go.uber.org/zap"
 )
 
-var zlog *zap.Logger
-var tracer = logging.LibraryLogger("solana-go", "github.com/streamingfast/solana-go/rpc/confirm", &zlog)
+var zlog, tracer = logging.PackageLogger("solana-go", "github.com/streamingfast/solana-go/rpc/confirm")

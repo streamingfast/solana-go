@@ -19,7 +19,7 @@ require (
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/viper v1.10.1
 	github.com/streamingfast/binary v0.0.0-20210928223119-44fc44e4a0b5
-	github.com/streamingfast/logging v0.0.0-20210908162127-bdc5856d5341
+	github.com/streamingfast/logging v0.0.0-20220214194203-5c70c134fea8
 	github.com/stretchr/testify v1.7.0
 	github.com/teris-io/shortid v0.0.0-20201117134242-e59966efd125 // indirect
 	github.com/tidwall/gjson v1.11.0

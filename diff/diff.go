@@ -198,11 +198,10 @@ func Diff(left interface{}, right interface{}, opts ...Option) {
 type diffReporter struct {
 	notify func(event Event)
 	path   cmp.Path
-	diffs  []string
 }
 
 func (r *diffReporter) PushStep(ps cmp.PathStep) {
-	if traceEnabled {
+	if tracer.Enabled() {
 		zlog.Debug("pushing path step", zap.Stringer("step", ps))
 	}
 
@@ -214,7 +213,7 @@ func (r *diffReporter) Report(rs cmp.Result) {
 		lastStep := r.path.Last()
 		vLeft, vRight := lastStep.Values()
 		if !vLeft.IsValid() {
-			if traceEnabled {
+			if tracer.Enabled() {
 				zlog.Debug("added event", zap.Stringer("path", r.path))
 			}
 
@@ -224,7 +223,7 @@ func (r *diffReporter) Report(rs cmp.Result) {
 		}
 
 		if !vRight.IsValid() {
-			if traceEnabled {
+			if tracer.Enabled() {
 				zlog.Debug("removed event", zap.Stringer("path", r.path))
 			}
 
@@ -235,7 +234,7 @@ func (r *diffReporter) Report(rs cmp.Result) {
 
 		if isArrayPathStep(lastStep) {
 			// We might want to do this only on certain circumstances?
-			if traceEnabled {
+			if tracer.Enabled() {
 				zlog.Debug("array changed event, splitting in removed, added", zap.Stringer("path", r.path))
 			}
 
@@ -244,7 +243,7 @@ func (r *diffReporter) Report(rs cmp.Result) {
 			return
 		}
 
-		if traceEnabled {
+		if tracer.Enabled() {
 			zlog.Debug("changed event", zap.Stringer("path", r.path))
 		}
 
@@ -253,7 +252,7 @@ func (r *diffReporter) Report(rs cmp.Result) {
 }
 
 func (r *diffReporter) PopStep() {
-	if traceEnabled {
+	if tracer.Enabled() {
 		zlog.Debug("popping path step", zap.Stringer("step", r.path[len(r.path)-1]))
 	}
 
@@ -263,17 +262,4 @@ func (r *diffReporter) PopStep() {
 func isArrayPathStep(step cmp.PathStep) bool {
 	_, ok := step.(cmp.SliceIndex)
 	return ok
-}
-
-func copyPath(path cmp.Path) Path {
-	if len(path) == 0 {
-		return Path(path)
-	}
-
-	out := make([]cmp.PathStep, len(path))
-	for i, step := range path {
-		out[i] = step
-	}
-
-	return Path(cmp.Path(out))
 }

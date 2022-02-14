@@ -390,6 +390,8 @@ github.com/streamingfast/binary v0.0.0-20210928223119-44fc44e4a0b5/go.mod h1:LEQ
 github.com/streamingfast/logging v0.0.0-20210811175431-f3b44b61606a/go.mod h1:4GdqELhZOXj4xwc4IaBmzofzdErGynnaSzuzxy0ZIBo=
 github.com/streamingfast/logging v0.0.0-20210908162127-bdc5856d5341 h1:+9UISis7a5u0ZDRS5dUWTF23eoKg9qcV4hXUImSEaDc=
 github.com/streamingfast/logging v0.0.0-20210908162127-bdc5856d5341/go.mod h1:4GdqELhZOXj4xwc4IaBmzofzdErGynnaSzuzxy0ZIBo=
+github.com/streamingfast/logging v0.0.0-20220214194203-5c70c134fea8 h1:qFLtOabZG4svQwAVa22KXzvgSMsBWfEQU3pzB8nagPo=
+github.com/streamingfast/logging v0.0.0-20220214194203-5c70c134fea8/go.mod h1:4GdqELhZOXj4xwc4IaBmzofzdErGynnaSzuzxy0ZIBo=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=

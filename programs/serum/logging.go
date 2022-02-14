@@ -16,12 +16,6 @@ package serum
 
 import (
 	"github.com/streamingfast/logging"
-	"go.uber.org/zap"
 )
 
-var zlog = zap.NewNop()
-var traceEnabled = logging.IsTraceEnabled("solana-go", "github.com/streamingfast/solana-go/program/serum")
-
-func init() {
-	logging.Register("github.com/streamingfast/solana-go/program/serum", &zlog)
-}
+var zlog, tracer = logging.PackageLogger("solana-go", "github.com/streamingfast/solana-go/program/serum")

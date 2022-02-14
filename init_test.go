@@ -1,9 +1,9 @@
 package solana
 
 import (
-	"go.uber.org/zap"
+	"github.com/streamingfast/logging"
 )
 
 func init() {
-	zlog, _ = zap.NewDevelopment()
+	logging.TestingOverride()
 }

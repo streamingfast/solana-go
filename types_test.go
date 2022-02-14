@@ -24,8 +24,6 @@ import (
 )
 
 func TestCompiledInstructions(t *testing.T) {
-	traceEnabled = true
-
 	ci := &CompiledInstruction{
 		ProgramIDIndex: 5,
 		AccountCount:   3,

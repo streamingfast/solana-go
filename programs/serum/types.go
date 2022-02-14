@@ -318,7 +318,7 @@ func (o *Orderbook) Items(descending bool, f func(node *SlabLeafNode) error) err
 	stack := []uint32{o.Root}
 	for len(stack) > 0 {
 		index, stack = stack[len(stack)-1], stack[:len(stack)-1]
-		if traceEnabled {
+		if tracer.Enabled() {
 			zlog.Debug("looking at slab index", zap.Int("index", int(index)))
 		}
 		slab := o.Nodes[index]
@@ -331,7 +331,7 @@ func (o *Orderbook) Items(descending bool, f func(node *SlabLeafNode) error) err
 				stack = append(stack, s.Children[1], s.Children[0])
 			}
 		case *SlabLeafNode:
-			if traceEnabled {
+			if tracer.Enabled() {
 				zlog.Debug("found leaf", zap.Int("leaf", int(index)))
 			}
 			f(s)
