@@ -60,31 +60,31 @@ type Data struct {
 }
 
 type DataV2 struct {
-	Name                 string
-	Symbol               string
-	URI                  string
-	SellerFeeBasisPoints uint16
-	Creators             *[]Creator  `bin:"optional"`
-	Collection           *Collection `bin:"optional"`
-	Uses                 *Uses       `bin:"optional"`
+	Name                 string      `json:"name"`
+	Symbol               string      `json:"symbol"`
+	URI                  string      `json:"uri"`
+	SellerFeeBasisPoints uint16      `json:"seller_fee_basis_points"`
+	Creators             *[]Creator  `bin:"optional" json:"creators"`
+	Collection           *Collection `bin:"optional"  json:"collection"`
+	Uses                 *Uses       `bin:"optional"  json:"uses"`
 }
 
 type Collection struct {
-	Verified bool
-	Key      solana.PublicKey
+	Verified bool             `json:"verified"`
+	Key      solana.PublicKey `json:"key"`
 }
 
 type Uses struct {
-	UseMethod UseMethod
-	Remaining uint64
-	Total     uint64
+	UseMethod UseMethod `json:"use_method"`
+	Remaining uint64    `json:"remaining"`
+	Total     uint64    `json:"total"`
 }
 
 type Creator struct {
-	Address  solana.PublicKey
-	Verified bool
+	Address  solana.PublicKey `json:"address"`
+	Verified bool             `json:"verified"`
 	// In percentages, NOT basis points ;) Watch out!
-	Share int8
+	Share int8 `json:"share"`
 }
 
 func (m *Metadata) Decode(in []byte) error {

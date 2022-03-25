@@ -367,10 +367,9 @@ func (t *withLoggingRoundTripper) RoundTrip(request *http.Request) (*http.Respon
 	logger := logging.Logger(request.Context(), *t.defaultLogger)
 
 	debugEnabled := logger.Core().Enabled(zap.DebugLevel)
-	traceEnabled := t.tracer.Enabled()
 
 	if debugEnabled {
-		if traceEnabled {
+		if tracer.Enabled() {
 			requestDump, err := httputil.DumpRequestOut(request, true)
 			if err != nil {
 				panic(fmt.Errorf("unexpecting that httputil.DumpRequestOut would panic: %w", err))
@@ -388,7 +387,7 @@ func (t *withLoggingRoundTripper) RoundTrip(request *http.Request) (*http.Respon
 	}
 
 	if debugEnabled {
-		if traceEnabled {
+		if tracer.Enabled() {
 			responseDump, err := httputil.DumpResponse(response, true)
 			if err != nil {
 				panic(fmt.Errorf("unexpecting that httputil.DumpRequestOut would panic: %w", err))
