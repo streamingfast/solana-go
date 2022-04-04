@@ -59,6 +59,19 @@ func FetchMints(ctx context.Context, rpcCli *rpc.Client) (out []*Mint, err error
 	return
 }
 
+func FetchMint(ctx context.Context, rpcCli *rpc.Client, mintAddr solana.PublicKey) (out *Mint, err error) {
+	resp, err := rpcCli.GetAccountInfo(ctx, mintAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	m := &Mint{}
+	if err := m.Decode(resp.Value.Data); err != nil {
+		return nil, fmt.Errorf("unable to decode mint %q: %w", mintAddr.String(), err)
+	}
+	return m, nil
+}
+
 func FetchAccountsForOwner(ctx context.Context, rpcCli *rpc.Client, owner solana.PublicKey) (out []*Account, err error) {
 	resp, err := rpcCli.GetProgramAccounts(
 		ctx,

@@ -3,6 +3,7 @@ package token
 import (
 	"bytes"
 	"fmt"
+	"github.com/streamingfast/solana-go/programs/system"
 
 	bin "github.com/streamingfast/binary"
 	"github.com/streamingfast/solana-go"
@@ -67,6 +68,14 @@ func (i *Instruction) Accounts() (out []*solana.AccountMeta) {
 	case 0:
 		accounts := i.Impl.(*InitializeMint).Accounts
 		out = []*solana.AccountMeta{accounts.Mint, accounts.RentProgram}
+	case 1:
+		accounts := i.Impl.(*InitializeAccount).Accounts
+		out = []*solana.AccountMeta{
+			accounts.Account,
+			accounts.Mint,
+			accounts.Owner,
+			accounts.RentSysvar,
+		}
 	case 3:
 		accounts := i.Impl.(*Transfer).Accounts
 		out = []*solana.AccountMeta{
@@ -370,6 +379,12 @@ type BurnChecked struct {
 	Accounts *BurnCheckedAccounts
 }
 
+/// Accounts expected by this instruction:
+///
+///   0. `[writable]`  The account to initialize.
+///   1. `[]` The mint this account will be associated with.
+///   2. `[]` The new account's owner/multisignature.
+///   3. `[]` Rent sysvar
 type InitializeAccountAccounts struct {
 	Account    *solana.AccountMeta `text:"linear,notype"`
 	Mint       *solana.AccountMeta `text:"linear,notype"`
@@ -389,4 +404,24 @@ func (i *InitializeAccount) SetAccounts(accounts []*solana.AccountMeta) error {
 		RentSysvar: accounts[3],
 	}
 	return nil
+}
+
+func NewInitializeAccount(
+	account solana.PublicKey,
+	mint solana.PublicKey,
+	recipient solana.PublicKey,
+) *Instruction {
+	return &Instruction{
+		BaseVariant: bin.BaseVariant{
+			TypeID: 1,
+			Impl: &InitializeAccount{
+				Accounts: &InitializeAccountAccounts{
+					Account:    &solana.AccountMeta{PublicKey: account, IsWritable: true},
+					Mint:       &solana.AccountMeta{PublicKey: mint},
+					Owner:      &solana.AccountMeta{PublicKey: recipient},
+					RentSysvar: &solana.AccountMeta{PublicKey: system.SYSVAR_RENT},
+				},
+			},
+		},
+	}
 }
