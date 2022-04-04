@@ -5,15 +5,15 @@ import (
 	"github.com/streamingfast/solana-go/programs/system"
 )
 
-type CreateMetadataAccount struct {
+type CreateMetadataV2Account struct {
 	Instruction InstType
-	Data        Data
+	Data        DataV2
 	IsMutable   bool
 
-	Accounts *CreateMetadataAccountAccounts `borsh_skip:"true"`
+	Accounts *CreateMetadataAccountV2Accounts `borsh_skip:"true"`
 }
 
-func (i CreateMetadataAccount) ListAccounts() []*solana.AccountMeta {
+func (i CreateMetadataV2Account) ListAccounts() []*solana.AccountMeta {
 	return []*solana.AccountMeta{
 		i.Accounts.Metadata,
 		i.Accounts.Mint,
@@ -33,7 +33,7 @@ func (i CreateMetadataAccount) ListAccounts() []*solana.AccountMeta {
 ///   4. `[]` update authority info
 ///   5. `[]` System program
 ///   6. `[]` Rent info
-type CreateMetadataAccountAccounts struct {
+type CreateMetadataAccountV2Accounts struct {
 	Metadata        *solana.AccountMeta
 	Mint            *solana.AccountMeta
 	MintAuthority   *solana.AccountMeta
@@ -43,9 +43,9 @@ type CreateMetadataAccountAccounts struct {
 	RentProgram     *solana.AccountMeta
 }
 
-func NewCreateMetadataAccountInstruction(
+func NewCreateMetadataAccountV2Instruction(
 	programID solana.PublicKey,
-	data Data,
+	data DataV2,
 	isMutable bool,
 	metadata,
 	mint,
@@ -53,11 +53,11 @@ func NewCreateMetadataAccountInstruction(
 	payer,
 	updateAuthority solana.PublicKey,
 ) *Instruction {
-	var inst = CreateMetadataAccount{
-		Instruction: CreateMetadataAccountV1Inst,
+	var inst = CreateMetadataV2Account{
+		Instruction: CreateMetadataAccountV2Inst,
 		Data:        data,
 		IsMutable:   isMutable,
-		Accounts: &CreateMetadataAccountAccounts{
+		Accounts: &CreateMetadataAccountV2Accounts{
 			Metadata:        &solana.AccountMeta{PublicKey: metadata, IsWritable: true},
 			Mint:            &solana.AccountMeta{PublicKey: mint},
 			MintAuthority:   &solana.AccountMeta{PublicKey: mintAuthority, IsSigner: true},
