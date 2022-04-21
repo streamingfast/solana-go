@@ -3,6 +3,7 @@ package confirm
 import (
 	"context"
 	"fmt"
+	"reflect"
 
 	"go.uber.org/zap"
 
@@ -37,11 +38,28 @@ func SendAndConfirmTransaction(ctx context.Context, rppClient *rpc.Client, wsCli
 		if err != nil {
 			return sig, err
 		}
-		signResult := res.(*ws.SignatureResult)
+
+		if isNil(res) {
+			return sig, fmt.Errorf("unable to confirm transactions")
+		}
+
+		signResult, ok := res.(*ws.SignatureResult)
+		if !ok {
+			return sig, fmt.Errorf("unable to confirm transactions, unkown websocket response")
+		}
 		if signResult.Value.Err != nil {
 			return sig, fmt.Errorf("transaction confirmation failed: %v", signResult.Value.Err)
 		} else {
 			return sig, nil
 		}
 	}
+}
+
+func isNil(v interface{}) bool {
+	if v == nil {
+		return true
+	}
+
+	rv := reflect.ValueOf(v)
+	return rv.Kind() == reflect.Ptr && rv.IsNil()
 }
