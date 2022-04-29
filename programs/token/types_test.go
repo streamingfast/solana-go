@@ -16,7 +16,6 @@ package token
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"os"
 	"testing"
@@ -71,7 +70,7 @@ func TestMint(t *testing.T) {
 	cli := rpc.NewClient("https://api.mainnet-beta.solana.com")
 
 	var m Mint
-	err := cli.GetAccountDataIn(context.Background(), addr, &m)
+	err := cli.GetAccountDataIn(addr, &m)
 	// handle `err`
 	require.NoError(t, err)
 
@@ -87,7 +86,7 @@ func TestRawMint(t *testing.T) {
 	addr := solana.MustPublicKeyFromBase58("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
 	cli := rpc.NewClient("https://api.mainnet-beta.solana.com")
 
-	resp, err := cli.GetAccountInfo(context.Background(), addr)
+	resp, err := cli.GetAccountInfo(addr)
 	// handle `err`
 	require.NoError(t, err)
 

@@ -15,8 +15,11 @@
 package rpc
 
 import (
+	"encoding/json"
+	"fmt"
 	bin "github.com/streamingfast/binary"
 	"github.com/streamingfast/solana-go"
+	"github.com/ybbus/jsonrpc"
 )
 
 type Context struct {
@@ -27,108 +30,6 @@ type RPCContext struct {
 	Context Context `json:"context,omitempty"`
 }
 
-type GetBalanceResult struct {
-	RPCContext
-	Value bin.Uint64 `json:"value"`
-}
-
-type GetSlotResult bin.Uint64
-
-type GetRecentBlockhashResult struct {
-	RPCContext
-	Value BlockhashResult `json:"value"`
-}
-
-type BlockhashResult struct {
-	Blockhash     solana.PublicKey `json:"blockhash"` /* make this a `Hash` type, which is a copy of the PublicKey` type */
-	FeeCalculator FeeCalculator    `json:"feeCalculator"`
-}
-
-type FeeCalculator struct {
-	LamportsPerSignature bin.Uint64 `json:"lamportsPerSignature"`
-}
-
-type GetConfirmedBlockResult struct {
-	Blockhash         solana.PublicKey      `json:"blockhash"`
-	PreviousBlockhash solana.PublicKey      `json:"previousBlockhash"` // could be zeroes if ledger was clean-up and this is unavailable
-	ParentSlot        bin.Uint64            `json:"parentSlot"`
-	Transactions      []TransactionWithMeta `json:"transactions"`
-	Rewards           []BlockReward         `json:"rewards"`
-	BlockTime         bin.Uint64            `json:"blockTime,omitempty"`
-}
-
-type BlockReward struct {
-	Pubkey   solana.PublicKey `json:"pubkey"`
-	Lamports bin.Uint64       `json:"lamports"`
-}
-
-type TransactionWithMeta struct {
-	Transaction *solana.Transaction `json:"transaction"`
-	Meta        *TransactionMeta    `json:"meta,omitempty"`
-}
-
-type TransactionParsed struct {
-	Transaction *ParsedTransaction `json:"transaction"`
-	Meta        *TransactionMeta   `json:"meta,omitempty"`
-}
-
-type TransactionMeta struct {
-	Err          interface{}  `json:"err"`
-	Fee          bin.Uint64   `json:"fee"`
-	PreBalances  []bin.Uint64 `json:"preBalances"`
-	PostBalances []bin.Uint64 `json:"postBalances"`
-}
-
-type TransactionSignature struct {
-	Err       interface{} `json:"err,omitempty"`
-	Memo      string      `json:"memo,omitempty"`
-	Signature string      `json:"signature,omitempty"`
-	Slot      bin.Uint64  `json:"slot,omitempty"`
-}
-
-type GetAccountInfoResult struct {
-	RPCContext
-	Value *Account `json:"value"`
-}
-
-type Account struct {
-	Lamports   bin.Uint64       `json:"lamports"`
-	Data       solana.Data      `json:"data"`
-	Owner      solana.PublicKey `json:"owner"`
-	Executable bool             `json:"executable"`
-	RentEpoch  bin.Uint64       `json:"rentEpoch"`
-}
-
-type GetProgramAccountsOpts struct {
-	Commitment CommitmentType `json:"commitment,omitempty"`
-
-	// Filter on accounts, implicit AND between filters
-	Filters []RPCFilter `json:"filters,omitempty"`
-}
-
-type GetProgramAccountsResult []*KeyedAccount
-
-type KeyedAccount struct {
-	Pubkey  solana.PublicKey `json:"pubkey"`
-	Account *Account         `json:"account"`
-}
-
-type GetConfirmedSignaturesForAddress2Opts struct {
-	Limit  uint64 `json:"limit,omitempty"`
-	Before string `json:"before,omitempty"`
-	Until  string `json:"until,omitempty"`
-}
-
-type GetConfirmedSignaturesForAddress2Result []*TransactionSignature
-
-type GetSignaturesForAddressOpts struct {
-	Limit  uint64 `json:"limit,omitempty"`
-	Before string `json:"before,omitempty"`
-	Until  string `json:"until,omitempty"`
-}
-
-type GetSignaturesForAddressResult []*TransactionSignature
-
 type RPCFilter struct {
 	Memcmp   *RPCFilterMemcmp `json:"memcmp,omitempty"`
 	DataSize bin.Uint64       `json:"dataSize,omitempty"`
@@ -137,6 +38,11 @@ type RPCFilter struct {
 type RPCFilterMemcmp struct {
 	Offset int           `json:"offset"`
 	Bytes  solana.Base58 `json:"bytes"`
+}
+
+type SendTransactionOptions struct {
+	SkipPreflight       bool           // disable transaction verification step
+	PreflightCommitment CommitmentType // preflight commitment level; default: "finalized"
 }
 
 // CommitmentType is the level of commitment desired when querying state.
@@ -159,43 +65,46 @@ const (
 	CommitmentSingleGossip = CommitmentType("singleGossip") // Deprecated as of v1.5.5
 )
 
-/// Parsed Transaction
-
-type ParsedTransaction struct {
-	Signatures []solana.Signature `json:"signatures"`
-	Message    Message            `json:"message"`
+type RpcError struct {
+	*jsonrpc.RPCError
+	trxError *TransactionError
+	Logs     []string
 }
 
-type Message struct {
-	AccountKeys     []*AccountKey `json:"accountKeys"`
-	RecentBlockhash solana.PublicKey/* TODO: change to Hash */ `json:"recentBlockhash"`
-	Instructions    []ParsedInstruction `json:"instructions"`
-}
+func fromRPCError(rerr *jsonrpc.RPCError) *RpcError {
+	rpcError := &RpcError{RPCError: rerr}
+	v, ok := rpcError.Data.(map[string]interface{})
+	if !ok {
+		return rpcError
+	}
+	rpcError.trxError = &TransactionError{Raw: v}
+	if err, ok := v["err"].(map[string]interface{}); ok {
+		if instructionError, ok := err["InstructionError"].([]interface{}); ok {
+			if len(instructionError) == 2 {
+				if idx, ok := instructionError[0].(uint64); ok {
+					rpcError.trxError.InstructionIndex = idx
+				}
+				if instErr, ok := instructionError[1].(map[string]interface{}); ok {
+					for instErrType, instErrCode := range instErr {
+						rpcError.trxError.InstructionErrorType = instErrType
 
-type AccountKey struct {
-	PublicKey solana.PublicKey `json:"pubkey"`
-	Signer    bool             `json:"signer"`
-	Writable  bool             `json:"writable"`
-}
+						if str, ok := instErrCode.(string); ok {
+							rpcError.trxError.InstructionErrorCode = str
+						} else if num, ok := instErrCode.(json.Number); ok {
+							rpcError.trxError.InstructionErrorCode = fmt.Sprintf("%s", num)
+						} else {
+							rpcError.trxError.InstructionErrorCode = "unknown"
+						}
+					}
+				}
+			}
+		}
+	}
 
-type ParsedInstruction struct {
-	Accounts  []solana.PublicKey `json:"accounts,omitempty"`
-	Data      solana.Base58      `json:"data,omitempty"`
-	Parsed    *InstructionInfo   `json:"parsed,omitempty"`
-	Program   string             `json:"program,omitempty"`
-	ProgramID solana.PublicKey   `json:"programId"`
-}
-
-type InstructionInfo struct {
-	Info            map[string]interface{} `json:"info"`
-	InstructionType string                 `json:"type"`
-}
-
-func (p *ParsedInstruction) IsParsed() bool {
-	return p.Parsed != nil
-}
-
-type SendTransactionOptions struct {
-	SkipPreflight       bool           // disable transaction verification step
-	PreflightCommitment CommitmentType // preflight commitment level; default: "finalized"
+	if logs, ok := v["logs"].([]interface{}); ok {
+		for _, log := range logs {
+			rpcError.Logs = append(rpcError.Logs, log.(string))
+		}
+	}
+	return rpcError
 }

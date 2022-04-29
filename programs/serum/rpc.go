@@ -47,7 +47,7 @@ func KnownMarket() ([]*MarketMeta, error) {
 }
 
 func FetchOpenOrders(ctx context.Context, rpcCli *rpc.Client, openOrdersAddr solana.PublicKey) (*OpenOrdersMeta, error) {
-	acctInfo, err := rpcCli.GetAccountInfo(ctx, openOrdersAddr)
+	acctInfo, err := rpcCli.GetAccountInfo(openOrdersAddr)
 	if err != nil {
 		return nil, fmt.Errorf("unable to get open orders account:%w", err)
 	}
@@ -62,7 +62,7 @@ func FetchOpenOrders(ctx context.Context, rpcCli *rpc.Client, openOrdersAddr sol
 }
 
 func FetchMarket(ctx context.Context, rpcCli *rpc.Client, marketAddr solana.PublicKey) (*MarketMeta, error) {
-	acctInfo, err := rpcCli.GetAccountInfo(ctx, marketAddr)
+	acctInfo, err := rpcCli.GetAccountInfo(marketAddr)
 	if err != nil {
 		return nil, fmt.Errorf("unable to get market account:%w", err)
 	}
@@ -101,11 +101,11 @@ func FetchMarket(ctx context.Context, rpcCli *rpc.Client, marketAddr solana.Publ
 		return nil, fmt.Errorf("unsupported market data length: %d", dataLen)
 	}
 
-	if err := rpcCli.GetAccountDataIn(ctx, meta.Market.GetQuoteMint(), &meta.QuoteMint); err != nil {
+	if err := rpcCli.GetAccountDataIn(meta.Market.GetQuoteMint(), &meta.QuoteMint); err != nil {
 		return nil, fmt.Errorf("getting quote mint: %w", err)
 	}
 
-	if err := rpcCli.GetAccountDataIn(ctx, meta.Market.GetBaseMint(), &meta.BaseMint); err != nil {
+	if err := rpcCli.GetAccountDataIn(meta.Market.GetBaseMint(), &meta.BaseMint); err != nil {
 		return nil, fmt.Errorf("getting base token: %w", err)
 	}
 

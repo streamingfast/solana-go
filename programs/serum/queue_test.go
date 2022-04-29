@@ -15,7 +15,6 @@
 package serum
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"strings"
@@ -41,10 +40,9 @@ func TestDecoder_EventQueue_Diff(t *testing.T) {
 
 	if os.Getenv("TESTDATA_UPDATE") == "true" {
 		client := rpc.NewClient("https://api.mainnet-beta.solana.com:80/rpc")
-		ctx := context.Background()
 		account := solana.MustPublicKeyFromBase58("13iGJcA4w5hcJZDjJbJQor1zUiDLE4jv2rMW9HkD5Eo1")
 
-		info, err := client.GetAccountInfo(ctx, account)
+		info, err := client.GetAccountInfo(account)
 		require.NoError(t, err)
 		writeCompressedFile(t, oldDataFile, info.Value.Data)
 
@@ -54,7 +52,7 @@ func TestDecoder_EventQueue_Diff(t *testing.T) {
 
 		time.Sleep(900 * time.Millisecond)
 
-		info, err = client.GetAccountInfo(ctx, account)
+		info, err = client.GetAccountInfo(account)
 		require.NoError(t, err)
 		writeCompressedFile(t, newDataFile, info.Value.Data)
 

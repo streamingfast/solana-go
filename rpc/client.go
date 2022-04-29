@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -81,164 +80,7 @@ func (c *Client) SetHeader(k, v string) {
 	c.headers.Set(k, v)
 }
 
-func (c *Client) GetBalance(ctx context.Context, publicKey string, commitment CommitmentType) (out *GetBalanceResult, err error) {
-	commit := map[string]string{
-		"commitment": string(commitment),
-	}
-	params := []interface{}{publicKey}
-	if commitment != "" {
-		params = append(params, commit)
-	}
-
-	err = c.DoRequest(&out, "getBalance", params...)
-	return
-}
-
-func (c *Client) GetRecentBlockhash(ctx context.Context, commitment CommitmentType) (out *GetRecentBlockhashResult, err error) {
-	commit := map[string]string{
-		"commitment": string(commitment),
-	}
-	var params []interface{}
-	if commitment != "" {
-		params = append(params, commit)
-	}
-
-	err = c.DoRequest(&out, "getRecentBlockhash", params)
-	return
-}
-
-func (c *Client) GetSlot(ctx context.Context, commitment CommitmentType) (out GetSlotResult, err error) {
-	commit := map[string]string{
-		"commitment": string(commitment),
-	}
-	var params []interface{}
-	if commitment != "" {
-		params = append(params, commit)
-	}
-
-	err = c.DoRequest(&out, "getSlot", params)
-	return
-}
-
-func (c *Client) GetConfirmedBlock(ctx context.Context, slot uint64, encoding string) (out *GetConfirmedBlockResult, err error) {
-	if encoding == "" {
-		encoding = "json"
-	}
-	params := []interface{}{slot, encoding}
-
-	err = c.DoRequest(&out, "getConfirmedBlock", params...)
-	return
-}
-
-func (c *Client) GetAccountInfo(ctx context.Context, account solana.PublicKey) (out *GetAccountInfoResult, err error) {
-	obj := map[string]interface{}{
-		"encoding": "base64",
-	}
-	params := []interface{}{account, obj}
-
-	err = c.DoRequest(&out, "getAccountInfo", params...)
-	if err != nil {
-		return nil, err
-	}
-
-	if out.Value == nil {
-		return nil, ErrNotFound
-	}
-
-	return out, nil
-}
-
-func (c *Client) GetAccountDataIn(ctx context.Context, account solana.PublicKey, inVar interface{}) (err error) {
-	resp, err := c.GetAccountInfo(ctx, account)
-	if err != nil {
-		return err
-	}
-
-	return bin.NewDecoder(resp.Value.Data).Decode(inVar)
-}
-
-func (c *Client) GetConfirmedTransaction(ctx context.Context, signature string) (out TransactionWithMeta, err error) {
-	params := []interface{}{signature, "json"}
-
-	err = c.DoRequest(&out, "getConfirmedTransaction", params...)
-	return
-}
-
-func (c *Client) GetConfirmedSignaturesForAddress2(ctx context.Context, address solana.PublicKey, opts *GetConfirmedSignaturesForAddress2Opts) (out GetConfirmedSignaturesForAddress2Result, err error) {
-
-	params := []interface{}{address.String(), opts}
-
-	err = c.DoRequest(&out, "getConfirmedSignaturesForAddress2", params...)
-	return
-}
-
-func (c *Client) GetSignaturesForAddress(ctx context.Context, address solana.PublicKey, opts *GetSignaturesForAddressOpts) (out GetSignaturesForAddressResult, err error) {
-	params := []interface{}{address.String(), opts}
-
-	err = c.DoRequest(&out, "getSignaturesForAddress", params...)
-	return
-}
-
-func (c *Client) GetProgramAccounts(ctx context.Context, publicKey solana.PublicKey, opts *GetProgramAccountsOpts) (out GetProgramAccountsResult, err error) {
-	obj := map[string]interface{}{
-		"encoding": "base64",
-	}
-	if opts != nil {
-		if opts.Commitment != "" {
-			obj["commitment"] = string(opts.Commitment)
-		}
-		if len(opts.Filters) != 0 {
-			obj["filters"] = opts.Filters
-		}
-	}
-
-	params := []interface{}{publicKey, obj}
-
-	err = c.DoRequest(&out, "getProgramAccounts", params...)
-	return
-}
-
-func (c *Client) GetMinimumBalanceForRentExemption(ctx context.Context, dataSize int) (lamport int, err error) {
-	params := []interface{}{dataSize}
-	err = c.DoRequest(&lamport, "getMinimumBalanceForRentExemption", params...)
-	return
-}
-
-type SimulateTransactionResponse struct {
-	Err  interface{}
-	Logs []string
-}
-
-func (c *Client) SimulateTransaction(ctx context.Context, transaction *solana.Transaction) (*SimulateTransactionResponse, error) {
-	buf := new(bytes.Buffer)
-	if err := bin.NewEncoder(buf).Encode(transaction); err != nil {
-		return nil, fmt.Errorf("send transaction: encode transaction: %w", err)
-	}
-	trxData := buf.Bytes()
-
-	obj := map[string]interface{}{
-		"encoding": "base64",
-	}
-
-	b64Data := base64.StdEncoding.EncodeToString(trxData)
-	params := []interface{}{
-		b64Data,
-		obj,
-	}
-
-	var out *SimulateTransactionResponse
-	if err := c.DoRequest(&out, "simulateTransaction", params...); err != nil {
-		return nil, fmt.Errorf("send transaction: rpc send: %w", err)
-	}
-
-	return out, nil
-
-}
-
-func (c *Client) SendTransaction(
-	transaction *solana.Transaction,
-	opts *SendTransactionOptions,
-) (signature string, err error) {
+func (c *Client) SendTransaction(transaction *solana.Transaction, opts *SendTransactionOptions) (signature string, err error) {
 	buf := new(bytes.Buffer)
 
 	if err := bin.NewEncoder(buf).Encode(transaction); err != nil {
@@ -255,7 +97,7 @@ func (c *Client) SendTransaction(
 			obj["skipPreflight"] = opts.SkipPreflight
 		}
 		if opts.PreflightCommitment != "" {
-			obj["preflightCommitment"] = opts.PreflightCommitment
+			obj["preflightCaommitment"] = opts.PreflightCommitment
 		}
 	}
 
@@ -268,33 +110,15 @@ func (c *Client) SendTransaction(
 		var rpcError *jsonrpc.RPCError
 		if errors.As(err, &rpcError) {
 			instructionError := fromRPCError(rpcError)
-			if c.debug {
+			if c.debug && instructionError.trxError != nil {
 				fmt.Println("RPC ERROR")
-				fmt.Printf("Instruction Index %d error: %s -> %s\n", instructionError.InstructionIndex, instructionError.InstructionErrorType, instructionError.InstructionErrorCode)
+				fmt.Printf("Instruction Index %d error: %s -> %s\n", instructionError.trxError.InstructionIndex, instructionError.trxError.InstructionErrorType, instructionError.trxError.InstructionErrorCode)
 				for _, log := range instructionError.Logs {
 					fmt.Println("> ", log)
 				}
 				zlog.Info("encountered RPC error", zap.Reflect("instruction_error", instructionError))
 			}
 		}
-		return "", fmt.Errorf("send transaction: rpc send: %w", err)
-	}
-	return
-}
-
-func (c *Client) RequestAirdrop(ctx context.Context, account *solana.PublicKey, lamport uint64, commitment CommitmentType) (signature string, err error) {
-
-	obj := map[string]interface{}{
-		"commitment": commitment,
-	}
-
-	params := []interface{}{
-		account.String(),
-		lamport,
-		obj,
-	}
-
-	if err := c.DoRequest(&signature, "requestAirdrop", params...); err != nil {
 		return "", fmt.Errorf("send transaction: rpc send: %w", err)
 	}
 	return
@@ -400,49 +224,4 @@ func (t *withLoggingRoundTripper) RoundTrip(request *http.Request) (*http.Respon
 	}
 
 	return response, nil
-}
-
-type TransactionError struct {
-	rpcError             *jsonrpc.RPCError
-	InstructionIndex     uint64
-	Logs                 []string
-	InstructionErrorCode string
-	InstructionErrorType string
-}
-
-func fromRPCError(rpcError *jsonrpc.RPCError) *TransactionError {
-	transactionErr := &TransactionError{rpcError: rpcError}
-	v, ok := rpcError.Data.(map[string]interface{})
-	if !ok {
-		return transactionErr
-	}
-	if err, ok := v["err"].(map[string]interface{}); ok {
-		if instructionError, ok := err["InstructionError"].([]interface{}); ok {
-			if len(instructionError) == 2 {
-				if idx, ok := instructionError[0].(uint64); ok {
-					transactionErr.InstructionIndex = idx
-				}
-				if instErr, ok := instructionError[1].(map[string]interface{}); ok {
-					for instErrType, instErrCode := range instErr {
-						transactionErr.InstructionErrorType = instErrType
-
-						if str, ok := instErrCode.(string); ok {
-							transactionErr.InstructionErrorCode = str
-						} else if num, ok := instErrCode.(json.Number); ok {
-							transactionErr.InstructionErrorCode = fmt.Sprintf("%s", num)
-						} else {
-							transactionErr.InstructionErrorCode = "unkown"
-						}
-					}
-				}
-			}
-		}
-	}
-
-	if logs, ok := v["logs"].([]interface{}); ok {
-		for _, log := range logs {
-			transactionErr.Logs = append(transactionErr.Logs, log.(string))
-		}
-	}
-	return transactionErr
 }

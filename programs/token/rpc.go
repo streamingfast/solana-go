@@ -27,9 +27,8 @@ import (
 
 //go:generate rice embed-go
 
-func FetchMints(ctx context.Context, rpcCli *rpc.Client) (out []*Mint, err error) {
+func FetchMints(rpcCli *rpc.Client) (out []*Mint, err error) {
 	resp, err := rpcCli.GetProgramAccounts(
-		ctx,
 		PROGRAM_ID,
 		&rpc.GetProgramAccountsOpts{
 			Filters: []rpc.RPCFilter{
@@ -59,8 +58,8 @@ func FetchMints(ctx context.Context, rpcCli *rpc.Client) (out []*Mint, err error
 	return
 }
 
-func FetchMint(ctx context.Context, rpcCli *rpc.Client, mintAddr solana.PublicKey) (out *Mint, err error) {
-	resp, err := rpcCli.GetAccountInfo(ctx, mintAddr)
+func FetchMint(rpcCli *rpc.Client, mintAddr solana.PublicKey) (out *Mint, err error) {
+	resp, err := rpcCli.GetAccountInfo(mintAddr)
 	if err != nil {
 		return nil, err
 	}
@@ -72,9 +71,8 @@ func FetchMint(ctx context.Context, rpcCli *rpc.Client, mintAddr solana.PublicKe
 	return m, nil
 }
 
-func FetchAccountsForOwner(ctx context.Context, rpcCli *rpc.Client, owner solana.PublicKey) (out []*Account, err error) {
+func FetchAccountsForOwner(rpcCli *rpc.Client, owner solana.PublicKey) (out []*Account, err error) {
 	resp, err := rpcCli.GetProgramAccounts(
-		ctx,
 		PROGRAM_ID,
 		&rpc.GetProgramAccountsOpts{
 			Filters: []rpc.RPCFilter{
@@ -103,9 +101,8 @@ func FetchAccountsForOwner(ctx context.Context, rpcCli *rpc.Client, owner solana
 	return
 }
 
-func FetchAccountHolders(ctx context.Context, rpcCli *rpc.Client, mint solana.PublicKey) (out []*Account, err error) {
+func FetchAccountHolders(rpcCli *rpc.Client, mint solana.PublicKey) (out []*Account, err error) {
 	resp, err := rpcCli.GetProgramAccounts(
-		ctx,
 		PROGRAM_ID,
 		&rpc.GetProgramAccountsOpts{
 			Filters: []rpc.RPCFilter{
@@ -135,7 +132,7 @@ func FetchAccountHolders(ctx context.Context, rpcCli *rpc.Client, mint solana.Pu
 }
 
 func TransferToken(ctx context.Context, rpcCli *rpc.Client, wsCli *ws.Client, amount uint64, senderSPLTokenAccount, mint, recipient solana.PublicKey, sender *solana.Account) (solana.PublicKey, string, error) {
-	blockHashResult, err := rpcCli.GetRecentBlockhash(ctx, rpc.CommitmentFinalized)
+	blockHashResult, err := rpcCli.GetLatestBlockhash(rpc.CommitmentFinalized)
 	if err != nil {
 		return solana.PublicKey{}, "", fmt.Errorf("unable retrieve recent block hash: %w", err)
 	}
@@ -176,7 +173,7 @@ func TransferToken(ctx context.Context, rpcCli *rpc.Client, wsCli *ws.Client, am
 }
 
 func DoCloseAccount(ctx context.Context, rpcCli *rpc.Client, wsCli *ws.Client, account, destination, owner solana.PublicKey, sender *solana.Account) (string, error) {
-	blockHashResult, err := rpcCli.GetRecentBlockhash(ctx, rpc.CommitmentFinalized)
+	blockHashResult, err := rpcCli.GetLatestBlockhash(rpc.CommitmentFinalized)
 	if err != nil {
 		return "", fmt.Errorf("unable retrieve recent block hash: %w", err)
 	}
