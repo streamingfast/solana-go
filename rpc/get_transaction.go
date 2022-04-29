@@ -82,13 +82,10 @@ type TransactionError struct {
 }
 
 func (t *TransactionError) UnmarshalJSON(data []byte) (err error) {
-	fmt.Println("asklfhaskjfhaskjfasdkjhf:", string(data))
 	var errMap map[string]interface{}
 	if err := json.Unmarshal(data, &errMap); err != nil {
 		return err
 	}
-	fmt.Println("map: ", len(errMap))
-
 	t.Raw = errMap
 	if instructionError, ok := t.Raw["InstructionError"].([]interface{}); ok {
 		if len(instructionError) == 2 {
@@ -113,8 +110,20 @@ func (t *TransactionError) UnmarshalJSON(data []byte) (err error) {
 	return
 }
 
-func (c *Client) GetTransaction(signature string) (out *GetTransactionResponse, err error) {
-	params := []interface{}{signature, "json"}
+func (c *Client) GetConfirmedTransaction(signature string) (out *GetTransactionResponse, err error) {
+	conf := CommitmentConfirmed
+	return c.GetTransaction(signature, &conf)
+}
+
+// GetTransaction For processing many dependent transactions in series, it's recommended to use "confirmed" commitment, which balances speed with rollback safety. For total safety, it's recommended to use"finalized" commitment.
+func (c *Client) GetTransaction(signature string, commitmentType *CommitmentType) (out *GetTransactionResponse, err error) {
+	opts := map[string]interface{}{
+		"encoding": "json",
+	}
+	if commitmentType != nil {
+		opts["Commitment"] = *commitmentType
+	}
+	params := []interface{}{signature, opts}
 	err = c.DoRequest(&out, "getTransaction", params...)
 	return
 }
