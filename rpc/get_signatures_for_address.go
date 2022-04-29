@@ -17,23 +17,23 @@ type TransactionSignature struct {
 }
 
 type GetSignaturesForAddressOpts struct {
-	Limit  *uint64 `json:"limit,omitempty"`
-	Before *string `json:"before,omitempty"`
-	Until  *string `json:"until,omitempty"`
+	Limit  uint64 `json:"limit,omitempty"`
+	Before string `json:"before,omitempty"`
+	Until  string `json:"until,omitempty"`
 }
 
 func (c *Client) GetSignaturesForAddress(address solana.PublicKey, opts *GetSignaturesForAddressOpts) (out GetSignaturesForAddressResult, err error) {
 	params := []interface{}{address.String()}
 	if opts != nil {
 		filter := map[string]interface{}{}
-		if opts.Limit != nil {
-			filter["limit"] = *opts.Limit
+		if opts.Limit > 0 {
+			filter["limit"] = opts.Limit
 		}
-		if opts.Before != nil {
-			filter["before"] = *opts.Before
+		if opts.Before != "" {
+			filter["before"] = opts.Before
 		}
-		if opts.Until != nil {
-			filter["until"] = *opts.Until
+		if opts.Until != "" {
+			filter["until"] = opts.Until
 		}
 		params = append(params, filter)
 	}

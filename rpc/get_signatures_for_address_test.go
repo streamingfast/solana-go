@@ -10,7 +10,6 @@ import (
 )
 
 func TestClient_GetSignaturesForAddress(t *testing.T) {
-	limit := uint64(2)
 	tests := []struct {
 		name        string
 		clientFunc  func(t *testing.T) (*Client, func(), func())
@@ -35,7 +34,7 @@ func TestClient_GetSignaturesForAddress(t *testing.T) {
 			},
 			address: solana.MustPublicKeyFromBase58("5PzHeoZPEbsW8GuQZ8ct9feFhSPdwBJY4Qb8CBaDLzN7"),
 			opts: &GetSignaturesForAddressOpts{
-				Limit: &limit,
+				Limit: 2,
 			},
 			expectOut: GetSignaturesForAddressResult([]*TransactionSignature{
 				{
@@ -67,7 +66,7 @@ func TestClient_GetSignaturesForAddress(t *testing.T) {
 			},
 			address: solana.MustPublicKeyFromBase58("5PzHeoZPEbsW8GuQZ8ct9feFhSPdwBJY4Qb8CBaDLzN7"),
 			opts: &GetSignaturesForAddressOpts{
-				Limit: &limit,
+				Limit: 2,
 			},
 			expectOut: nil,
 		},
