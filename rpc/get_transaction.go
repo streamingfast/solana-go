@@ -19,6 +19,14 @@ type Transaction struct {
 	Message    *Message `json:"message"`
 }
 
+func (t *Transaction) ResolveProgramIdIndex(programIdIndex uint64) (out solana.PublicKey, err error) {
+	if int(programIdIndex) < len(t.Message.AccountKeys) {
+		return t.Message.AccountKeys[programIdIndex], nil
+	}
+
+	return out, fmt.Errorf("programID index not found %d", programIdIndex)
+}
+
 type Message struct {
 	AccountKeys     []solana.PublicKey `json:"accountKeys"`
 	Header          MessageHeader      `json:"header"`
