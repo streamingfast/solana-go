@@ -38,6 +38,14 @@ type AccountMeta struct {
 	IsWritable bool
 }
 
+func NewAccountMeta(publicKey PublicKey, isSigner bool, isWritable bool) *AccountMeta {
+	return &AccountMeta{
+		PublicKey:  publicKey,
+		IsSigner:   isSigner,
+		IsWritable: isWritable,
+	}
+}
+
 func (a *AccountMeta) less(act *AccountMeta) bool {
 	if a.IsSigner != act.IsSigner {
 		return a.IsSigner

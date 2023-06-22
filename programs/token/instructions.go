@@ -94,7 +94,6 @@ func (i *Instruction) Accounts() (out []*solana.AccountMeta) {
 		out = []*solana.AccountMeta{
 			accounts.Mint,
 			accounts.Account,
-			accounts.MintAuthority,
 		}
 	case 9:
 		accounts := i.Impl.(*CloseAccount).Accounts
@@ -273,9 +272,9 @@ func NewSetAuthorityInstruction(
 }
 
 type MintToAccounts struct {
-	Mint          *solana.AccountMeta
-	Account       *solana.AccountMeta
-	MintAuthority *solana.AccountMeta
+	Mint         *solana.AccountMeta
+	Account      *solana.AccountMeta
+	MultiSigners []*solana.AccountMeta
 
 	///   0. `[writable]` The mint.
 	///   1. `[writable]` The account to mint tokens to.
@@ -291,21 +290,33 @@ func NewMintTo(
 	Amount uint64,
 	Mint solana.PublicKey,
 	Account solana.PublicKey,
-	MintAuthority solana.PublicKey,
 ) *Instruction {
+	// FIXME: Currently, we do not support multi signature accounts
 	return &Instruction{
 		BaseVariant: bin.BaseVariant{
 			TypeID: 7,
 			Impl: &MintTo{
 				Amount: Amount,
 				Accounts: &MintToAccounts{
-					Mint:          &solana.AccountMeta{PublicKey: Mint, IsWritable: true},
-					Account:       &solana.AccountMeta{PublicKey: Account, IsWritable: true},
-					MintAuthority: &solana.AccountMeta{PublicKey: MintAuthority, IsSigner: true},
+					Mint:    &solana.AccountMeta{PublicKey: Mint, IsWritable: true},
+					Account: &solana.AccountMeta{PublicKey: Account, IsWritable: true},
 				},
 			},
 		},
 	}
+}
+
+func (i *MintTo) SetAccounts(accounts []*solana.AccountMeta) error {
+	i.Accounts = &MintToAccounts{
+		Mint:    accounts[0],
+		Account: accounts[1],
+	}
+
+	if len(accounts) > 2 {
+		i.Accounts.MultiSigners = accounts[2:]
+	}
+
+	return nil
 }
 
 type BurnAccounts struct {
@@ -379,12 +390,12 @@ type BurnChecked struct {
 	Accounts *BurnCheckedAccounts
 }
 
-/// Accounts expected by this instruction:
-///
-///   0. `[writable]`  The account to initialize.
-///   1. `[]` The mint this account will be associated with.
-///   2. `[]` The new account's owner/multisignature.
-///   3. `[]` Rent sysvar
+// / Accounts expected by this instruction:
+// /
+// /   0. `[writable]`  The account to initialize.
+// /   1. `[]` The mint this account will be associated with.
+// /   2. `[]` The new account's owner/multisignature.
+// /   3. `[]` Rent sysvar
 type InitializeAccountAccounts struct {
 	Account    *solana.AccountMeta `text:"linear,notype"`
 	Mint       *solana.AccountMeta `text:"linear,notype"`
