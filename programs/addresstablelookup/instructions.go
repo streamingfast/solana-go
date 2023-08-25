@@ -1,19 +1,30 @@
 package addresstablelookup
 
-import "github.com/mr-tron/base58"
+import (
+	"bytes"
+)
 
-func ParseNewAddresses(addresses []byte) []string {
-	var newAddresses []string
-	numberOfAddresses := len(addresses) / 32
+var AddressLookupTableExtendTableInstruction = []byte{02, 00, 00, 00}
 
-	for i := 0; i < numberOfAddresses; i++ {
-		if i == numberOfAddresses {
+func ExtendAddressTableLookupInstruction(data []byte) bool {
+	if len(data) != 4 {
+		return false
+	}
+	return bytes.Equal(data, AddressLookupTableExtendTableInstruction)
+}
+
+func ParseNewAccounts(accounts []byte) [][]byte {
+	var newAccounts [][]byte
+	numberOfAccounts := len(accounts) / 32
+
+	for i := 0; i < numberOfAccounts; i++ {
+		if i == numberOfAccounts {
 			break
 		}
 
-		addr := addresses[(i * 32) : (i+1)*32]
-		newAddresses = append(newAddresses, base58.Encode(addr))
+		addr := accounts[(i * 32) : (i+1)*32]
+		newAccounts = append(newAccounts, addr)
 	}
 
-	return newAddresses
+	return newAccounts
 }
