@@ -7,10 +7,10 @@ import (
 var AddressLookupTableExtendTableInstruction = []byte{02, 00, 00, 00}
 
 func ExtendAddressTableLookupInstruction(data []byte) bool {
-	if len(data) != 4 {
+	if len(data) < 4 {
 		return false
 	}
-	return bytes.Equal(data, AddressLookupTableExtendTableInstruction)
+	return bytes.Equal(data[:4], AddressLookupTableExtendTableInstruction)
 }
 
 func ParseNewAccounts(accounts []byte) [][]byte {
