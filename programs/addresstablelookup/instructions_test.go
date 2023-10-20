@@ -1,6 +1,8 @@
 package addresstablelookup
 
 import (
+	"encoding/hex"
+	"fmt"
 	"github.com/mr-tron/base58"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -62,6 +64,16 @@ func Test_ExtendAddressTableLookupInstruction(t *testing.T) {
 	}
 }
 
-func TestExtendLookupTable(t *testing.T) {
+func TestExtendLookupTableDecode(t *testing.T) {
+	dataBytes, err := hex.DecodeString("02000000010000000000000000000000020000000634ff9fb638edb36d9e9e1730ef57bc9286bb905ca2a33e4eca42136e575f810277a6af97339b7ac88d1892c90446f50002309266f62e53c118244982000000")
+	require.NoError(t, err)
 
+	decodedInstruction, err := DecodeInstruction(nil, dataBytes)
+	fmt.Println(decodedInstruction)
+	//switch val := decodedInstruction.Impl.(type) {
+	//case *ExtendLookupTable:
+	//	fmt.Println("\tExtendLookUpTable - Accounts: ", val.String())
+	//default:
+	//	assert.True(t, false)
+	//}
 }
