@@ -61,3 +61,7 @@ func Test_ExtendAddressTableLookupInstruction(t *testing.T) {
 		})
 	}
 }
+
+func TestExtendLookupTable(t *testing.T) {
+
+}
