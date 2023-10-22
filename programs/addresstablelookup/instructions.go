@@ -9,23 +9,21 @@ import (
 	"strings"
 )
 
-var ADDRESS_LOOKUP_TABLE_PROGRAM_ID = solana.MustPublicKeyFromBase58("AddressLookupTab1e1111111111111111111111111")
-
-var AddressLookupTableExtendTableInstruction = []byte{02, 00, 00, 00}
+var AddressLookupTableProgramId = solana.MustPublicKeyFromBase58("AddressLookupTab1e1111111111111111111111111")
 
 func init() {
-	solana.RegisterInstructionDecoder(ADDRESS_LOOKUP_TABLE_PROGRAM_ID, registryDecodeInstruction)
+	solana.RegisterInstructionDecoder(AddressLookupTableProgramId, registryDecodeInstruction)
 }
 
-func registryDecodeInstruction(accounts []*solana.AccountMeta, data []byte) (interface{}, error) {
-	inst, err := DecodeInstruction(accounts, data)
+func registryDecodeInstruction(_ []*solana.AccountMeta, data []byte) (interface{}, error) {
+	inst, err := DecodeInstruction(data)
 	if err != nil {
 		return nil, err
 	}
 	return inst, nil
 }
 
-func DecodeInstruction(accounts []*solana.AccountMeta, data []byte) (*Instruction, error) {
+func DecodeInstruction(data []byte) (*Instruction, error) {
 	var inst Instruction
 	if err := bin.NewDecoder(data).Decode(&inst); err != nil {
 		return nil, fmt.Errorf("unable to decode instruction for address lookup table program: %w", err)
@@ -35,9 +33,11 @@ func DecodeInstruction(accounts []*solana.AccountMeta, data []byte) (*Instructio
 }
 
 var InstructionDefVariant = bin.NewVariantDefinition(bin.Uint32TypeIDEncoding, []bin.VariantType{
+	{"createTableLookup", (*CreateLookupTable)(nil)},
+	{"freezeLookupTable", (*FreezeLookupTable)(nil)},
 	{"extendLookupTable", (*ExtendLookupTable)(nil)},
-	{"extendLookupTable", (*ExtendLookupTable)(nil)},
-	{"extendLookupTable", (*ExtendLookupTable)(nil)},
+	{"deactivateLookupTable", (*DeactivateLookupTable)(nil)},
+	{"closeLookupTable", (*CloseLookupTable)(nil)},
 })
 
 type Instruction struct {
@@ -56,6 +56,13 @@ func (i *Instruction) MarshalBinary(encoder *bin.Encoder) error {
 	return encoder.Encode(i.Impl)
 }
 
+type CreateLookupTable struct {
+	RecentSlot uint64
+	BumpSeed   uint8
+}
+
+type FreezeLookupTable struct{}
+
 type ExtendLookupTable struct {
 	AddressCount uint64 `bin:"sizeof=Addresses"`
 	Addresses    [][32]byte
@@ -73,33 +80,14 @@ func (e *ExtendLookupTable) String() string {
 	return sb.String()
 }
 
+type DeactivateLookupTable struct{}
+
+type CloseLookupTable struct{}
+
 func (i *Instruction) Data() ([]byte, error) {
 	buf := new(bytes.Buffer)
 	if err := bin.NewEncoder(buf).Encode(i); err != nil {
 		return nil, fmt.Errorf("unable to encode instruction: %w", err)
 	}
 	return buf.Bytes(), nil
-}
-
-func ExtendAddressTableLookupInstruction(data []byte) bool {
-	if len(data) < 4 {
-		return false
-	}
-	return bytes.Equal(data[:4], AddressLookupTableExtendTableInstruction)
-}
-
-func ParseNewAccounts(accounts []byte) [][]byte {
-	var newAccounts [][]byte
-	numberOfAccounts := len(accounts) / 32
-
-	for i := 0; i < numberOfAccounts; i++ {
-		if i == numberOfAccounts {
-			break
-		}
-
-		addr := accounts[(i * 32) : (i+1)*32]
-		newAccounts = append(newAccounts, addr)
-	}
-
-	return newAccounts
 }
